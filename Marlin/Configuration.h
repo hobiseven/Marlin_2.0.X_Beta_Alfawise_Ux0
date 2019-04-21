@@ -81,8 +81,8 @@
 //     Print bed PID settings MUST be tuned
 
 //#define U20_PLUS
-//#define U20
-#define U30
+#define U20
+//#define U30
 
 // 2 - Select the screen controller type. Most common is ILI9341 - First option. If your screen remains white,
 //     Try the alternate setting - this should enable ST7789V or ILI9328. For other LCDs... code is needed
@@ -104,6 +104,9 @@
 #define color1 0xDEE6 // 11011 110111 00110
 #define color2 0x145F // 00010 100010 11111
 #define color3 0xF3E0 // 11110 011111 00000 
+
+// 5 - ToouchMI configuration
+//#define TOUCHMI
 
 
 
@@ -881,7 +884,7 @@
  * A Fix-Mounted Probe either doesn't deploy or needs manual deployment.
  *   (e.g., an inductive probe or a nozzle-based probe-switch.)
  */
-//#define FIX_MOUNTED_PROBE
+#define FIX_MOUNTED_PROBE
 
 /**
  * Z Servo Probe, such as an endstop switch on a rotating arm.
@@ -905,6 +908,28 @@
   #if ENABLED(BLTOUCH_V3)
     //#define BLTOUCH_FORCE_5V_MODE
     //#define BLTOUCH_FORCE_OPEN_DRAIN_MODE
+  #endif
+#endif
+
+/**
+ * TouchMI Configuration
+ * https://www.hotends.fr
+ */
+//For tuning Autoleveling sensor "TouchMi" on lcd
+
+#if ENABLED(TOUCHMI)
+  #define FIX_MOUNTED_PROBE
+  #if DISABLED(FIX_MOUNTED_PROBE)
+    #define FIX_MOUNTED_PROBE
+  #endif
+  #if DISABLED(Z_SAFE_HOMING)
+    #define Z_SAFE_HOMING
+  #endif
+  #if ENABLED(Z_HOMING_HEIGHT)
+    #undef Z_HOMING_HEIGHT
+  #endif
+  #if DISABLED(Z_HOMING_HEIGHT)
+    #define Z_HOMING_HEIGHT 20
   #endif
 #endif
 
