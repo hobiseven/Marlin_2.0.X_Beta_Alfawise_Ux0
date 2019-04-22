@@ -74,7 +74,7 @@
 
 // Forum link to help with a tutorial, in French! :
 // https://www.lesimprimantes3d.fr/forum/topic/18260-alfawise-u20x-u30-marlin-2x-firmware-alternatif/
-// 
+//
 // 1 - Select your Alfawise U30 or U20 or U20+printer, but ONLY ONE!!
 
 //     U20_PLUS  is not tested, as we do not have a printer to test.
@@ -103,7 +103,7 @@
 
 #define color1 0xDEE6 // 11011 110111 00110
 #define color2 0x145F // 00010 100010 11111
-#define color3 0xF3E0 // 11110 011111 00000 
+#define color3 0xF3E0 // 11110 011111 00000
 
 
 
@@ -513,7 +513,7 @@
   #define DEFAULT_Kp 17.22
   #define DEFAULT_Ki 1.00
   #define DEFAULT_Kd 74.22
- 
+
 
   // MakerGear
   //#define DEFAULT_Kp 7.0
@@ -573,21 +573,21 @@
   //#define DEFAULT_bedKd 1675.16
 
 #if ENABLED(U30)
-  //From M303 command for Alfawise U30 : 
+  //From M303 command for Alfawise U30 :
   #define DEFAULT_bedKp 338.46
   #define DEFAULT_bedKi 63.96
   #define DEFAULT_bedKd 447.78
 #endif
 
 #if ENABLED(U20)
-  //From M303 command for Alfawise U20 : 
+  //From M303 command for Alfawise U20 :
   #define DEFAULT_bedKp 841.68
   #define DEFAULT_bedKi 152.12
   #define DEFAULT_bedKd 1164.25
 #endif
 
-#if ENABLED(U20_PLUS) // The PID setting MUST be updated. 
-  //From M303 command for Alfawise U20 : 
+#if ENABLED(U20_PLUS) // The PID setting MUST be updated.
+  //From M303 command for Alfawise U20 :
   #define DEFAULT_bedKp 841.68
   #define DEFAULT_bedKi 152.12
   #define DEFAULT_bedKd 1164.25
@@ -2053,7 +2053,7 @@
 //=============================================================================
 
 //
-// MKS Robin 320x240 color display OR Alfawise. Same interface is used. 
+// MKS Robin 320x240 color display OR Alfawise. Same interface is used.
 //
 #define MKS_ROBIN_TFT
 

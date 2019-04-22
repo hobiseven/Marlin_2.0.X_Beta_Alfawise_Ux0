@@ -12,11 +12,11 @@ void touch_swSPI_init(void)
   pinMode(TOUCH_INT, INPUT); // Pendrive interrupt pin, used as pooling in IStouched
   pinMode(TOUCH_CS, OUTPUT);
   pinMode(TOUCH_SCK, OUTPUT);
-  pinMode(TOUCH_MOSI, OUTPUT); 
+  pinMode(TOUCH_MOSI, OUTPUT);
   pinMode(TOUCH_MISO, INPUT);
 
   digitalWrite (TOUCH_SCK,0);
-  digitalWrite (TOUCH_CS, 1); 
+  digitalWrite (TOUCH_CS, 1);
   getInTouch(XPT2046_X); // this is a dummy read needed to enable pendrive status pin
 
 }
@@ -28,7 +28,7 @@ uint16_t x, y;
   if (timeout > millis()) {return 0;}
   timeout = millis() + 250;
 
-// We rely on XPT2046 compatible mode to ADS7843, hence no Z1 and Z2 measurements possible. 
+// We rely on XPT2046 compatible mode to ADS7843, hence no Z1 and Z2 measurements possible.
 
   if (digitalRead(TOUCH_INT)) {return 0;} // if TOUCH_INT is high, no fingers are pressing on the touch screen > exit
   x = (uint16_t)((((uint32_t)getInTouch(XPT2046_X)) * XPT2046_X_CALIBRATION) >> 16) + XPT2046_X_OFFSET;
@@ -46,7 +46,7 @@ uint16_t getInTouch(uint8_t coordinate) {
     coordinate |= XPT2046_CONTROL | XPT2046_DFR_MODE;
 
     OUT_WRITE(TOUCH_CS, 0);
-   
+
     uint16_t data[3], delta[3];
 
  for (uint16_t i = 0; i < 3 ; i++){
@@ -67,7 +67,7 @@ uint16_t getInTouch(uint8_t coordinate) {
       OUT_WRITE(TOUCH_SCK,0);
       data[i]>>=4;
     }
-   
+
     OUT_WRITE(TOUCH_CS, 1);
 
     delta[0] = data[0] > data[1] ? data[0] - data [1] : data[1] - data [0];

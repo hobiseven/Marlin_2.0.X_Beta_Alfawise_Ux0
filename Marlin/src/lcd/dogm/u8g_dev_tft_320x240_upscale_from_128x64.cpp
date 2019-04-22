@@ -168,10 +168,10 @@ static const uint8_t ili9341_init_sequence[] = { // 0x9341 - ILI9341
   U8G_ESC_ADR(0), 0xC5, U8G_ESC_ADR(1), 0x3E, 0x28,
   U8G_ESC_ADR(0), 0xC7, U8G_ESC_ADR(1), 0x86,
   U8G_ESC_ADR(0), 0xB1, U8G_ESC_ADR(1), 0x00, 0x18,
-  U8G_ESC_ADR(0), 0xC0, U8G_ESC_ADR(1), 0x23,  
-  U8G_ESC_ADR(0), 0xC1, U8G_ESC_ADR(1), 0x10,    
+  U8G_ESC_ADR(0), 0xC0, U8G_ESC_ADR(1), 0x23,
+  U8G_ESC_ADR(0), 0xC1, U8G_ESC_ADR(1), 0x10,
   U8G_ESC_ADR(0), 0x29,
-  U8G_ESC_ADR(0), 0x11,  
+  U8G_ESC_ADR(0), 0x11,
   U8G_ESC_DLY(100),
   U8G_ESC_END
 };
@@ -286,18 +286,18 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
       u8g_WriteEscSeqP(u8g, dev, clear_screen_sequence);
       for (i = 0; i < 960; i++)
         u8g_WriteSequence(u8g, dev, 160, (uint8_t *)buffer);
-      
+
       u8g_WriteEscSeqP(u8g, dev, button0_sequence);
       drawImage(button0, u8g, dev, 40, 20, color1);
-      
-      for (i = 0; i < 150; i++) buffer[i] = color3; 
+
+      for (i = 0; i < 150; i++) buffer[i] = color3;
       u8g_WriteEscSeqP(u8g, dev, separation_line_sequence_left);
-      for (i = 0; i < 4; i++) 
+      for (i = 0; i < 4; i++)
         u8g_WriteSequence(u8g, dev, 150, (uint8_t *)buffer);
 
-      for (i = 0; i < 150; i++) buffer[i] = color3; 
+      for (i = 0; i < 150; i++) buffer[i] = color3;
       u8g_WriteEscSeqP(u8g, dev, separation_line_sequence_right);
-      for (i = 0; i < 4; i++) 
+      for (i = 0; i < 4; i++)
         u8g_WriteSequence(u8g, dev, 150, (uint8_t *)buffer);
 
       u8g_WriteEscSeqP(u8g, dev, button1_sequence);
