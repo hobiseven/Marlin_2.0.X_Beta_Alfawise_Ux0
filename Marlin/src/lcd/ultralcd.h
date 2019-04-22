@@ -56,7 +56,11 @@
     uint8_t get_ADC_keyValue();
   #endif
 
+  #if defined(TOUCH_INT)
+  #define LCD_UPDATE_INTERVAL 20
+  #else
   #define LCD_UPDATE_INTERVAL 100
+  #endif
 
   #if HAS_LCD_MENU
 
