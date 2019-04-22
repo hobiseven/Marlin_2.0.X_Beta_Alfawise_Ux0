@@ -187,7 +187,7 @@
 #elif defined(U20_PLUS)
 #define CUSTOM_MACHINE_NAME "Alfawise U20+"
 #else
-#define CUSTOM_MACHINE_NAME "Alfawise Ux0"
+#define CUSTOM_MACHINE_NAME "3D Printer"
 #endif
 
 // Define this to set a unique identifier for this printer, (Used by some programs to differentiate between machines)

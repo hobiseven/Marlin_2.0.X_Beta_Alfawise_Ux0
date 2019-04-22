@@ -421,7 +421,8 @@
 #elif MB(MKS_ROBIN)
   #include "pins_MKS_ROBIN.h"         // STM32F1                                    env:mks_robin
 #elif MB(ALFAWISE_UX0)
-  #include "pins_ALFAWISE_UX0.h"      // STM32F1                                    env:mks_robin
+  #include "pins_ALFAWISE_UX0.h"      // STM32F1                                    env:alfawise_uX0
+
 //
 // STM32 ARM Cortex-M4F
 //

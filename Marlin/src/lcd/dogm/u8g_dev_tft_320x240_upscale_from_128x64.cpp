@@ -302,7 +302,7 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
 
       u8g_WriteEscSeqP(u8g, dev, button1_sequence);
       drawImage(button1, u8g, dev, 40, 20, color1);
-!
+
       u8g_WriteEscSeqP(u8g, dev, button2_sequence);
       drawImage(button2, u8g, dev, 40, 20, color2);
 

@@ -61,7 +61,6 @@
   #include "xpt2046.h"
 #endif
 
-
 #if ENABLED(HOST_ACTION_COMMANDS)
   #include "feature/host_actions.h"
 #endif

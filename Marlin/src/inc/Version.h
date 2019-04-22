@@ -80,7 +80,7 @@
   #elif defined(U20_PLUS)
   #define MACHINE_NAME "Alfawise U20+"
   #else
-  #define MACHINE_NAME "Alfawise Ux0"
+  #define MACHINE_NAME "3D Printer"
   #endif
 
   /**
