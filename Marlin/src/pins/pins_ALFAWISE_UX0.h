@@ -29,19 +29,13 @@
 #endif
 
 #if HOTENDS > 1 || E_STEPPERS > 1
-  #error "ALFAWISE U30 supports up to 1 hotends / E-steppers. Comment out this line to continue."
+  #error "ALFAWISE only supports up to 1 hotends / E-steppers. Comment out this line to continue."
 #endif
 
-#ifdef U20
-#define BOARD_NAME "Longer3D U20"
-#elif defined(U30)
-#define BOARD_NAME "Longer3D U30"
-#elif defined(U20_PLUS)
-#define BOARD_NAME "Longer3D U20+"
-#else
-#define BOARD_NAME "Longer3D Ux0"
-#endif
-                              // Release PB4 (STEP_X_PIN) from JTAG NRST role.  
+#define BOARD_NAME "Longer3D"
+#define ALFAWISE_UX0 // common to all alfawise STM32F1 boards
+
+                              // Release PB4 (STEP_X_PIN) from JTAG NRST role.
 // #define DISABLE_DEBUG      // > Hobi : We still want to debug with STLINK...
 #define DISABLE_JTAG          //we free the jtag pins ( pa15) but keep STLINK
 
@@ -57,7 +51,7 @@
 // or GCODE STOP COMMAND. / May also be used for Z_Probe Servo function
 
 //Servo for Z_Probe
-// #define SERVO0_PIN PE5 / Z_MAX / If you don't care about optional GCODE STOP COMMAND or 
+// #define SERVO0_PIN PE5 / Z_MAX / If you don't care about optional GCODE STOP COMMAND or
 //already used Y_Max Endstop.
 // #define SERVO0_PIN PC14 / Y_MAX / If you want to keep GCODE STOP COMMAND or/and Y_MAX not used.
 
@@ -114,7 +108,7 @@
  * Note: Alfawise TFT screens may have 6 different TFT controllers
  * If the screen stays white, disable 'LCD_RESET_PIN' to rely on the bootloader to do screen initialization.
  * Supported screens based on ILI9342, ILI9328 and ST7798V. For other proper initialisation sequence needs to be definned in u8g_dev_tft_320x240_upscale_from_128x64.cpp
- * 
+ *
  * Enabling 'LCD_RESET_PIN' causes flickering when entering the LCD menu due to LCD controller reset.
  * Reset feature was designed to "revive the LCD if static electricity killed it."
  */
@@ -141,7 +135,7 @@
 // SPI1 (EEPROM W25Q64 + DAC OUT)
 //
 
-//#define SPI_EEPROM          // If commented this will create a file on the SD card as a replacement 
+//#define SPI_EEPROM          // If commented this will create a file on the SD card as a replacement
 #define SPI_CHAN_EEPROM1   1
 #define SPI_EEPROM1_CS     PC5
 
