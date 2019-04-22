@@ -81,8 +81,8 @@
 //     Print bed PID settings MUST be tuned
 
 //#define U20_PLUS
-//#define U20
-#define U30
+#define U20
+//#define U30
 
 // 2 - Select the screen controller type. Most common is ILI9341 - First option. If your screen remains white,
 //     Try the alternate setting - this should enable ST7789V or ILI9328. For other LCDs... code is needed
@@ -95,8 +95,8 @@
 //     V1.1 panels seem to be older, and came with green PCB. This selection only influence the calibration data
 //     Should calibration need to be redone, please follow the French Tutorial!
 
-//#define TS_V11
-#define TS_V12
+#define TS_V11
+//#define TS_V12
 
 // 4 - If you cant to change arrow buttons color > color1, enter button color > color2, separation line color > color3
 //     This is RGB 16 bits 5-6-5 format
@@ -1669,7 +1669,7 @@
  * Enable one of the following items for a slower SPI transfer speed.
  * This may be required to resolve "volume init" errors.
  */
-#define SPI_SPEED SPI_HALF_SPEED
+//#define SPI_SPEED SPI_HALF_SPEED
 //#define SPI_SPEED SPI_QUARTER_SPEED
 //#define SPI_SPEED SPI_EIGHTH_SPEED
 

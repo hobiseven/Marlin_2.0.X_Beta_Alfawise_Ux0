@@ -1,6 +1,6 @@
 # Marlin_2.0.X_Beta_Alfawise_Ux0
 
-This is the initial commit of the Marlin 2.0.X code port to Alfawise Ux0 boards. ONLY COMPILES with STM32 5.3.0
+This is the initial commit of the Marlin 2.0.X code port to Alfawise Ux0 boards. ONLY COMPILES with STM32 5.3.0 Libs or above
 
 This is based on a Marlin2.0.x_bugfix pull 14th April 2019 + custom code modified from JMZ52 + Hobi code specific for Alfawise 
 
@@ -11,7 +11,6 @@ https://www.lesimprimantes3d.fr/forum/topic/18260-alfawise-u20x-u30-marlin-2x-fi
 
 
 For developpers, or debugging if the screen does not work : 
-Added code :
 
 -ILI9341 support / init code
 -Improved detection for ILI9341 screens that do not have the proper identifier in register 0x04 of the driver chip,*

@@ -538,7 +538,8 @@ void MarlinUI::quick_feedback(const bool clear_buttons/*=true*/) {
 
   #if HAS_ENCODER_ACTION
     if (clear_buttons) buttons = 0;
-    next_button_update_ms = millis() + 500;
+    next_button_update_ms = millis() + 200;
+
   #else
     UNUSED(clear_buttons);
   #endif
