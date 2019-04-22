@@ -531,14 +531,13 @@ void MarlinUI::kill_screen(PGM_P lcd_msg) {
 }
 
 void MarlinUI::quick_feedback(const bool clear_buttons/*=true*/) {
-
-  #if HAS_LCD_MENU
+  #if HAS_LCD_MENU && !defined(TOUCH_INT)
     refresh();
   #endif
 
   #if HAS_ENCODER_ACTION
     if (clear_buttons) buttons = 0;
-    next_button_update_ms = millis() + 200;
+    next_button_update_ms = millis() + 500;
 
   #else
     UNUSED(clear_buttons);
