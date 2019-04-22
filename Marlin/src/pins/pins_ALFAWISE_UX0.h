@@ -32,9 +32,15 @@
   #error "ALFAWISE U30 supports up to 1 hotends / E-steppers. Comment out this line to continue."
 #endif
 
-#define BOARD_NAME "Alfawise U30"
-
-
+#ifdef U20
+#define BOARD_NAME "Longer3D U20"
+#elif defined(U30)
+#define BOARD_NAME "Longer3D U30"
+#elif defined(U20_PLUS)
+#define BOARD_NAME "Longer3D U20+"
+#else
+#define BOARD_NAME "Longer3D Ux0"
+#endif
                               // Release PB4 (STEP_X_PIN) from JTAG NRST role.  
 // #define DISABLE_DEBUG      // > Hobi : We still want to debug with STLINK...
 #define DISABLE_JTAG          //we free the jtag pins ( pa15) but keep STLINK
