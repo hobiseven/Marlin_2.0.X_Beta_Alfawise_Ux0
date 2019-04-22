@@ -73,7 +73,15 @@
   /**
    * Defines a generic printer name to be output to the LCD after booting Marlin.
    */
+  #ifdef U20
+  #define MACHINE_NAME "Alfawise U20"
+  #elif defined(U30)
+  #define MACHINE_NAME "Alfawise U30"
+  #elif defined(U20_PLUS)
+  #define MACHINE_NAME "Alfawise U20+"
+  #else
   #define MACHINE_NAME "Alfawise Ux0"
+  #endif
 
   /**
    * The SOURCE_CODE_URL is the location where users will find the Marlin Source

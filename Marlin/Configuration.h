@@ -180,7 +180,15 @@
 
 // Optional custom name for your RepStrap or other custom machine
 // Displayed in the LCD "Ready" message
+#ifdef U20
+#define CUSTOM_MACHINE_NAME "Alfawise U20"
+#elif defined(U30)
+#define CUSTOM_MACHINE_NAME "Alfawise U30"
+#elif defined(U20_PLUS)
+#define CUSTOM_MACHINE_NAME "Alfawise U20+"
+#else
 #define CUSTOM_MACHINE_NAME "Alfawise Ux0"
+#endif
 
 // Define this to set a unique identifier for this printer, (Used by some programs to differentiate between machines)
 // You can use an online service to generate a random UUID. (eg http://www.uuidgenerator.net/version4)
