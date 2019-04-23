@@ -68,7 +68,7 @@
 #define PAGE_HEIGHT 8
 
 #define X_MIN 32
-#define Y_MIN 28
+#define Y_MIN 30
 #define X_MAX (X_MIN + 2 * WIDTH  - 1)
 #define Y_MAX (Y_MIN + 2 * HEIGHT - 1)
 
