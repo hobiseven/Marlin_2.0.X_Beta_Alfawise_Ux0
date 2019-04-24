@@ -218,8 +218,8 @@ void MarlinUI::set_font(const MarlinFont font_nr) {
 // Initialize or re-initialize the LCD
 void MarlinUI::init_lcd() {
 
-  #if PIN_EXISTS(LCD_BACKLIGHT) // Enable LCD backlight
-    OUT_WRITE(LCD_BACKLIGHT_PIN, HIGH);
+  #if PIN_EXISTS(LCD_BACKLIGHT) // Avoid White flash on init
+    OUT_WRITE(LCD_BACKLIGHT_PIN, LOW);
   #endif
 
   #if EITHER(MKS_12864OLED, MKS_12864OLED_SSD1306)
@@ -253,6 +253,10 @@ void MarlinUI::init_lcd() {
   #endif
 
   uxg_SetUtf8Fonts(g_fontinfo, COUNT(g_fontinfo));
+
+  #if PIN_EXISTS(LCD_BACKLIGHT) // Enable LCD backlight, late for TFT
+    OUT_WRITE(LCD_BACKLIGHT_PIN, HIGH);
+  #endif
 }
 
 // The kill screen is displayed for unrecoverable conditions
