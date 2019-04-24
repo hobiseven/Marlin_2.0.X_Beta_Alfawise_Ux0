@@ -101,9 +101,8 @@
 // 4 - If you cant to change arrow buttons color > color1, enter button color > color2, separation line color > color3
 //     This is RGB 16 bits 5-6-5 format
 
-#define color1 0xDEE6 // 11011 110111 00110
-#define color2 0x145F // 00010 100010 11111
-#define color3 0xF3E0 // 11110 011111 00000
+//#define TFT_BTSLEFT_COLOR 0xDEE6 // 11011 110111 00110 Yellow
+//#define TFT_BTRIGHT_COLOR 0x145F // 00010 100010 11111 Blue
 
 
 
@@ -135,7 +134,7 @@
 //#define SHOW_CUSTOM_BOOTSCREEN
 
 // Enable to show the bitmap in Marlin/_Statusscreen.h on the status screen.
-//#define CUSTOM_STATUS_SCREEN_IMAGE
+#define CUSTOM_STATUS_SCREEN_IMAGE
 
 // @section machine
 

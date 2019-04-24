@@ -51,6 +51,8 @@ millis_t GcodeSuite::previous_move_ms;
 
 bool GcodeSuite::axis_relative_modes[] = AXIS_RELATIVE_MODES;
 
+bool usb_serial_connected = false;
+
 #if ENABLED(HOST_KEEPALIVE_FEATURE)
   GcodeSuite::MarlinBusyState GcodeSuite::busy_state = NOT_BUSY;
   uint8_t GcodeSuite::host_keepalive_interval = DEFAULT_KEEPALIVE_INTERVAL;

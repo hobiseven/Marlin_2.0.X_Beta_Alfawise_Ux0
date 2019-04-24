@@ -68,7 +68,7 @@
 #define PAGE_HEIGHT 8
 
 #define X_MIN 32
-#define Y_MIN 30
+#define Y_MIN 32
 #define X_MAX (X_MIN + 2 * WIDTH  - 1)
 #define Y_MAX (Y_MIN + 2 * HEIGHT - 1)
 
@@ -90,6 +90,20 @@ static const uint8_t page_first_sequence[] = {
 static const uint8_t clear_screen_sequence[] = {
   U8G_ESC_ADR(0), LCD_COLUMN, U8G_ESC_ADR(1), 0x00, 0x00, 0x01, 0x3F,
   U8G_ESC_ADR(0), LCD_ROW,    U8G_ESC_ADR(1), 0x00, 0x00, 0x00, 0xEF,
+  U8G_ESC_ADR(0), LCD_WRITE_RAM, U8G_ESC_ADR(1),
+  U8G_ESC_END
+};
+
+static const uint8_t sd_sequence[] = {
+  U8G_ESC_ADR(0), LCD_COLUMN, U8G_ESC_ADR(1), U8G_ESC_DATA(32), U8G_ESC_DATA(63),
+  U8G_ESC_ADR(0), LCD_ROW,    U8G_ESC_ADR(1), U8G_ESC_DATA(8), U8G_ESC_DATA(31),
+  U8G_ESC_ADR(0), LCD_WRITE_RAM, U8G_ESC_ADR(1),
+  U8G_ESC_END
+};
+
+static const uint8_t usb_sequence[] = {
+  U8G_ESC_ADR(0), LCD_COLUMN, U8G_ESC_ADR(1), U8G_ESC_DATA(72), U8G_ESC_DATA(119),
+  U8G_ESC_ADR(0), LCD_ROW,    U8G_ESC_ADR(1), U8G_ESC_DATA(8), U8G_ESC_DATA(31),
   U8G_ESC_ADR(0), LCD_WRITE_RAM, U8G_ESC_ADR(1),
   U8G_ESC_END
 };
@@ -245,6 +259,40 @@ static const uint8_t button2[] = {
    B01111111,B11111111,B11111111,B11111111,B11111110,
 };
 
+static const uint8_t sd_logo[] = {
+   B00000000,B00000000,
+   B01110011,B11000000,
+   B10001001,B00100000,
+   B10000001,B00100000,
+   B01110001,B00100000,
+   B00001001,B00100000,
+   B10001001,B00100000,
+   B01110011,B11000000,
+};
+
+static const uint8_t usb_logo[] = {
+   B00000000,B00000000,B00000000,
+   B10001001,B11001111,B00000000,
+   B10001010,B00101000,B10000000,
+   B10001010,B00001000,B10000000,
+   B10001001,B11001111,B00000000,
+   B10001000,B00101000,B10000000,
+   B10001010,B00101000,B10000000,
+   B01110001,B11001111,B00000000,
+};
+
+//#define COLOR_BLUE  0x00D2
+#define COLOR_BLUE  0x2C5D
+#define COLOR_RED   0xF800
+#define COLOR_DARK  0x2124 // Dark grey
+
+#ifndef TFT_BTSLEFT_COLOR
+#define TFT_BTSLEFT_COLOR COLOR_BLUE
+#endif
+#ifndef TFT_BTRIGHT_COLOR
+#define TFT_BTRIGHT_COLOR COLOR_RED
+#endif
+
 void drawImage(const uint8_t *data, u8g_t *u8g, u8g_dev_t *dev,uint16_t length, uint16_t height, uint16_t color) {
   uint16_t i, j, k;
   uint16_t buffer[160];
@@ -265,11 +313,18 @@ void drawImage(const uint8_t *data, u8g_t *u8g, u8g_dev_t *dev,uint16_t length, 
   }
 }
 
+#if defined(SDIO_SUPPORT) && defined(CUSTOM_STATUS_SCREEN_IMAGE)
+#define DYNAMIC_DEV_ICONS
+#include "../ultralcd.h"
+#include "../../sd/cardreader.h"
+#include "../../gcode/gcode.h"
+static bool sd, usb;
+#endif
+
 uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, uint8_t msg, void *arg) {
   u8g_pb_t *pb = (u8g_pb_t *)(dev->dev_mem);
   uint16_t buffer[256]; //16 bit RGB 565 pixel line buffer
-  uint32_t i, j, k;
-
+  uint16_t i;
   switch (msg) {
     case U8G_DEV_MSG_INIT:
       dev->com_fn(u8g, U8G_COM_MSG_INIT, U8G_SPI_CLK_CYCLE_NONE, &lcd_id);
@@ -287,24 +342,26 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
       for (i = 0; i < 960; i++)
         u8g_WriteSequence(u8g, dev, 160, (uint8_t *)buffer);
 
-      u8g_WriteEscSeqP(u8g, dev, button0_sequence);
-      drawImage(button0, u8g, dev, 40, 20, color1);
+      // bottom line and buttons
 
-      for (i = 0; i < 150; i++) buffer[i] = color3;
+      for (i = 0; i < 150; i++) buffer[i] = COLOR_DARK;
       u8g_WriteEscSeqP(u8g, dev, separation_line_sequence_left);
       for (i = 0; i < 4; i++)
         u8g_WriteSequence(u8g, dev, 150, (uint8_t *)buffer);
 
-      for (i = 0; i < 150; i++) buffer[i] = color3;
+      for (i = 0; i < 150; i++) buffer[i] = COLOR_DARK;
       u8g_WriteEscSeqP(u8g, dev, separation_line_sequence_right);
       for (i = 0; i < 4; i++)
         u8g_WriteSequence(u8g, dev, 150, (uint8_t *)buffer);
 
+      u8g_WriteEscSeqP(u8g, dev, button0_sequence);
+      drawImage(button0, u8g, dev, 40, 20, TFT_BTSLEFT_COLOR);
+
       u8g_WriteEscSeqP(u8g, dev, button1_sequence);
-      drawImage(button1, u8g, dev, 40, 20, color1);
+      drawImage(button1, u8g, dev, 40, 20, TFT_BTSLEFT_COLOR);
 
       u8g_WriteEscSeqP(u8g, dev, button2_sequence);
-      drawImage(button2, u8g, dev, 40, 20, color2);
+      drawImage(button2, u8g, dev, 40, 20, TFT_BTRIGHT_COLOR);
 
       break;
 
@@ -312,15 +369,27 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
       break;
 
     case U8G_DEV_MSG_PAGE_FIRST:
+#ifdef DYNAMIC_DEV_ICONS
+      // top icons
+      sd = card.isDetected();
+      usb = usb_serial_connected;
+      //if (ui.on_status_screen()) {
+        u8g_WriteEscSeqP(u8g, dev, sd_sequence);
+        drawImage(sd_logo, u8g, dev, 16, 8, sd ? COLOR_BLUE : COLOR_DARK);
+
+        u8g_WriteEscSeqP(u8g, dev, usb_sequence);
+        drawImage(usb_logo, u8g, dev, 24, 8, usb ? COLOR_BLUE : COLOR_DARK);
+      //}
+#endif
       u8g_WriteEscSeqP(u8g, dev, page_first_sequence);
       break;
 
     case U8G_DEV_MSG_PAGE_NEXT:
-      for (j = 0; j < 8; j++) {
-        k = 0;
+      for (uint16_t y = 0; y < 8; y++) {
+        uint32_t k = 0;
         for (i = 0; i < (uint32_t)pb->width; i++) {
           const uint8_t b = *(((uint8_t *)pb->buf) + i);
-          const uint16_t c = TEST(b, j) ? 0x7FFF : 0x0000;
+          const uint16_t c = TEST(b, y) ? 0x7FFF : 0x0000;
           buffer[k++] = c; buffer[k++] = c;
         }
         for (k = 0; k < 2; k++) {
