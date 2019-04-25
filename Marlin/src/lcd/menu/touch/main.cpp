@@ -62,17 +62,18 @@ void do_calibration() {
   dma_disable(FSMC_DMA_DEV, FSMC_DMA_CHANNEL);
   dma_set_priority(FSMC_DMA_DEV, FSMC_DMA_CHANNEL, DMA_PRIORITY_HIGH);
 
-  LCD_BacklightOn();
+  TOUCH_LCD_BacklightOn();
 
-  LCD_IO_Init();
-  LCD_Delay(100);
-  LCD_Reset();
+  TOUCH_LCD_IO_Init();
+  TOUCH_LCD_Delay(100);
+  TOUCH_LCD_Reset();
 
   Serial1.print("DisplayID ID1 Reg : ");
-  reg00 = LCD_IO_ReadData(0x00);
+  reg00 = TOUCH_LCD_IO_ReadReg(0x00);
   if (reg00 == 0) {
-    data = LCD_IO_ReadData(0x04, 3);  // reading ID1 register to get LCD controller ID, MOST of the time located in register 0x04
-     lcdId = (uint16_t)(data & 0xFFFF);
+    // read ID1 register to get LCD controller ID, MOST of the time located in register 0x04
+    data = TOUCH_LCD_IO_ReadData(0x04, 3);
+    lcdId = (uint16_t)(data & 0xFFFF);
     Serial1.print((data >> 16) & 0xFF, HEX);
     Serial1.print(" ");
   } else {
@@ -84,9 +85,10 @@ void do_calibration() {
     Serial1.println("");
     Serial1.println("Cannot identify screen controller with reg 0x04 .Trying alternate ID register");
     Serial1.print("DisplayID ID4 reg  : ");
-    reg00 = LCD_IO_ReadData(0x00);
+    reg00 = TOUCH_LCD_IO_ReadReg(0x00);
     if (reg00 == 0) {
-      data = LCD_IO_ReadData(0xD3, 3);  // reading ID4 register (0xD3)  to get ILI9341 identifier instead of register ID (0x04)
+      // reading ID4 register (0xD3)  to get ILI9341 identifier instead of register ID (0x04)
+      data = TOUCH_LCD_IO_ReadData(0xD3, 3);
       lcdId = (uint16_t)(data & 0xFFFF);
       Serial1.print((data >> 16) & 0xFF, HEX);
       Serial1.print(" ");
@@ -299,13 +301,13 @@ void loop_calibration() {
   }
 
   if (backlightTimeout < millis()) {
-    LCD_BacklightOff();
+    TOUCH_LCD_BacklightOff();
   }
 
   if (!getTouchPoint(&x, &y)) return;
 
   if (backlightTimeout < millis()) {
-    LCD_BacklightOn();
+    TOUCH_LCD_BacklightOn();
     waitForRelease();
     delay(200);
     backlightTimeout = millis() + 30000;
@@ -318,7 +320,7 @@ void loop_calibration() {
   y = (uint16_t)((((int32_t)y * (int32_t)yCalibration) >> 16) + yOffset);
 
   lcdSetWindow(x, y);
-  LCD_IO_WriteData(color);
+  TOUCH_LCD_IO_WriteData(color);
 }
 
 #else /* other arch */

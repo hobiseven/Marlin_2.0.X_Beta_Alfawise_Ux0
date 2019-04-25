@@ -43,9 +43,6 @@ static inline void dma_set_num_transfers32(dma_dev *dev, dma_channel channel, ui
 #define FSMC_NE1  PD7
 #define FSMC_A16  PD11
 
-#define LCD_BACKLIGHT_PIN   PD12
-#define LCD_RESET_PIN       PC4
-
 #define LCD       ((LCD_CONTROLLER_TypeDef *) (0x60000000 | 0x0001FFFE)) // FSMC_NE1 FSMC_A16
 
 typedef struct {
@@ -65,9 +62,15 @@ void TOUCH_LCD_IO_Init(void);
 void TOUCH_LCD_IO_WriteData(uint16_t RegValue);
 void TOUCH_LCD_IO_WriteReg(uint16_t Reg);
 uint32_t TOUCH_LCD_IO_ReadData(uint16_t RegValue, uint8_t ReadSize);
-uint16_t TOUCH_LCD_IO_ReadData(uint16_t RegValue);
-uint16_t TOUCH_LCD_IO_ReadData(void);
+uint16_t TOUCH_LCD_IO_ReadReg(uint16_t RegValue);
+uint16_t TOUCH_LCD_IO_ReadRam(void);
 void TOUCH_LCD_Delay(uint32_t milliseconds);
+
+// Alfawise specific!
+#ifndef LCD_BACKLIGHT_PIN
+#define LCD_BACKLIGHT_PIN   PD12
+#define LCD_RESET_PIN       PC4
+#endif
 void TOUCH_LCD_BacklightOn(void);
 void TOUCH_LCD_BacklightOff(void);
 void TOUCH_LCD_Reset(void);
@@ -77,10 +80,11 @@ void TOUCH_LCD_Reset(void);
 #define TOUCH_LCD_IO_Init()
 #define TOUCH_LCD_IO_WriteData(r)
 #define TOUCH_LCD_IO_WriteReg(r)
-#define TOUCH_LCD_IO_ReadData()
-#define TOUCH_LCD_IO_ReadData(x)
 #define TOUCH_LCD_IO_ReadData(r,s)
+#define TOUCH_LCD_IO_ReadReg(x)
+#define TOUCH_LCD_IO_ReadRam()
 #define TOUCH_LCD_Delay(m)
+
 #define TOUCH_LCD_BacklightOn()
 #define TOUCH_LCD_BacklightOff()
 #define TOUCH_LCD_Reset()
@@ -88,12 +92,8 @@ void TOUCH_LCD_Reset(void);
 #endif
 
 // Rename to avoid conflict with STM32 component
-#define LCD_IO_Init()       TOUCH_LCD_IO_Init()
 #define LCD_IO_WriteData(r) TOUCH_LCD_IO_WriteData(r)
 #define LCD_IO_WriteReg(r)  TOUCH_LCD_IO_WriteReg(r)
-#define LCD_IO_ReadData     TOUCH_LCD_IO_ReadData
 #define LCD_Delay(m)        TOUCH_LCD_Delay(m)
-#define LCD_BacklightOn()   TOUCH_LCD_BacklightOn()
-#define LCD_BacklightOff()  TOUCH_LCD_BacklightOff()
 #define LCD_Reset()         TOUCH_LCD_Reset()
 

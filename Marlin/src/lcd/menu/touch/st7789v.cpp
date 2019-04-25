@@ -2,7 +2,7 @@
 #include "fsmc.h"
 
 void st7789v_Init(void) {
-  LCD_IO_Init();
+  TOUCH_LCD_IO_Init();
 
   /* Sleep In Command */
   LCD_IO_WriteReg(ST7789V_SLEEP_IN);

@@ -70,7 +70,7 @@ void lcdPrint(uint16_t x, uint16_t y, char *text)
     for (i = 0; i < 2; i++)
       for (j = 0; j < 8; j++)
         for (k = 0; k < 8; k++)
-          LCD_IO_WriteData(font[character][i + 2 * k] & (128 >> j) ? color  : bgColor);
+          TOUCH_LCD_IO_WriteData(font[character][i + 2 * k] & (128 >> j) ? color  : bgColor);
   }
 }
 

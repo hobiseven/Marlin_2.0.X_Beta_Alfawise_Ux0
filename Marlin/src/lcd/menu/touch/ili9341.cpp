@@ -3,7 +3,7 @@
 #include "fsmc.h"
 
 void ILI9341_Init(void) {
-  LCD_IO_Init();
+  TOUCH_LCD_IO_Init();
 
   /* Sleep In Command */
   LCD_IO_WriteReg(ILI9341_SLEEP_IN);
