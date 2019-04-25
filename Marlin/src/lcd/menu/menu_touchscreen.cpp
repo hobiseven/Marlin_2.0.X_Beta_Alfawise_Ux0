@@ -19,7 +19,7 @@
 
 #include "../../inc/MarlinConfigPre.h"
 
-#if 1 //def ALFAWISE_UX0
+#if ENABLED(TOUCH_BUTTONS)
 
 #include "menu.h"
 #include "touch/calibration.h"
@@ -35,8 +35,8 @@ void menu_touchscreen() {
 #else
   STATIC_ITEM("ILI9341 v1.2", false, false);
 #endif
-  STATIC_ITEM("X: " STRINGIFY(XPT2046_X_CALIBRATION)" "STRINGIFY(XPT2046_X_OFFSET), false);
-  STATIC_ITEM("Y: " STRINGIFY(XPT2046_Y_CALIBRATION)" "STRINGIFY(XPT2046_Y_OFFSET), false);
+  STATIC_ITEM("X: " STRINGIFY(XPT2046_X_CALIBRATION) " " STRINGIFY(XPT2046_X_OFFSET), false);
+  STATIC_ITEM("Y: " STRINGIFY(XPT2046_Y_CALIBRATION) " " STRINGIFY(XPT2046_Y_OFFSET), false);
   END_MENU();
 }
 
@@ -44,4 +44,4 @@ void enter_touch_calibrate() {
   calibration.init_calibration(1);
 }
 
-#endif // ALFAWISE_UX0
+#endif // TOUCH_BUTTONS

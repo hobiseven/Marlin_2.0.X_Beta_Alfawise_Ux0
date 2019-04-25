@@ -7,19 +7,26 @@
 #define XPT2046_X               0x10
 #define XPT2046_Y               0x50
 
+#ifdef XPT2046_X_OFFSET
 #define XPT2046_X_CALIBRATION   12430
 #define XPT2046_X_OFFSET        -35
 #define XPT2046_Y_CALIBRATION   -8838
 #define XPT2046_Y_OFFSET        255
+#endif
 
+#ifndef TOUCH_INT
 #define TP_CS2  PB12
 #define TP_INT  PC6
-
-// the 3 defines below are needed for the sw_SPI function
-
 #define TP_SCK  PB13
 #define TP_MISO PB15
 #define TP_MOSI PB14
+#else
+#define TP_INT  TOUCH_INT
+#define TP_CS2  TOUCH_CS
+#define TP_SCK  TOUCH_SCK
+#define TP_MISO TOUCH_MISO
+#define TP_MOSI TOUCH_MOSI
+#endif
 
 void initTouch(void); // Not used as HW spi is incompatible with alfawise board routing
 void initTouch_sw_SPI(void);

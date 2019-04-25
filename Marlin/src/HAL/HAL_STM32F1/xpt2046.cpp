@@ -18,7 +18,6 @@ void touch_swSPI_init(void)
   digitalWrite (TOUCH_SCK,0);
   digitalWrite (TOUCH_CS, 1);
   getInTouch(XPT2046_X); // this is a dummy read needed to enable pendrive status pin
-
 }
 
 uint8_t xpt2046_read_buttons()

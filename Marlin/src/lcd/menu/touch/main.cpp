@@ -1,10 +1,17 @@
+#include "../../../inc/MarlinConfigPre.h"
+
 #include <Arduino.h>
 #include <HardwareSerial.h>
 
-#include "stdio.h"
-
+#include <stdio.h>
 #include "lcd.h"
 #include "xpt2046.h"
+
+#ifndef HEATER_BED_PIN
+#define HEATER_BED_PIN PA8
+#define HEATER_0_PIN   PD3
+#define FAN_PIN       PA15
+#endif
 
 //#define STM32_HIGH_DENSITY
 
@@ -41,14 +48,13 @@ void do_calibration() {
   pinMode(PC2, OUTPUT); // initialize LED digital pin as an output on Longer3D LK1/LK2 boards
   digitalWrite(PC2, HIGH);
 
-  //Set all heaters inactive, as well as Alfawise fan
-
-  pinMode(PA8, OUTPUT);
-  digitalWrite(PA8, LOW);
-  pinMode(PA15, OUTPUT);
-  digitalWrite(PA15, LOW);
-  pinMode(PD3, OUTPUT);
-  digitalWrite(PD3, LOW);
+  // Set all heaters inactive, as well as Alfawise fan
+  pinMode(HEATER_BED_PIN, OUTPUT);
+  digitalWrite(HEATER_BED_PIN, LOW);
+  pinMode(HEATER_0_PIN, OUTPUT);
+  digitalWrite(HEATER_0_PIN, LOW);
+  pinMode(FAN_PIN, OUTPUT);
+  digitalWrite(FAN_PIN, LOW);
 
   Serial1.begin(250000);
   Serial1.println("\nSTM32F103VET6");
