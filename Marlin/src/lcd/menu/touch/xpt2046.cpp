@@ -1,9 +1,12 @@
 #include <Arduino.h>
+
+#if defined(ARDUINO_ARCH_STM32)
+
 #include <HardwareSerial.h>
 
 #include "xpt2046.h"
 
-void initTouch_sw_SPI(void)
+void initTouch_sw_SPI()
 {
   pinMode(TP_INT, INPUT);  // Pendrive interrupt pin, used as pooling in IStouched
   pinMode(TP_CS2, OUTPUT);
@@ -14,8 +17,8 @@ void initTouch_sw_SPI(void)
   //spiConfig = SPISettings(XPT2046_SPI_CLOCK, MSBFIRST, SPI_MODE0);
   // Not needed, as these settings are hardcoded in the function
 
-  digitalWrite (TP_SCK,0);
-  digitalWrite (TP_CS2, 1);
+  digitalWrite(TP_SCK,0);
+  digitalWrite(TP_CS2, 1);
 
   // Dummy read to initialize pd1 and pd0 bits from ADS7843
   getTouchCoordinate_sw_SPI(XPT2046_X);
@@ -71,3 +74,10 @@ bool getTouchPoint(uint16_t *x, uint16_t *y)
 
   return true;
 }
+
+#else // !ARDUINO_ARCH_STM32
+void initTouch_sw_SPI() {}
+uint16_t getTouchCoordinate_sw_SPI(uint8_t coordinate) {}
+bool getTouchPoint(uint16_t *x, uint16_t *y) {}
+#endif
+

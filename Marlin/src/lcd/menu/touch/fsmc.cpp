@@ -1,6 +1,8 @@
 #include "fsmc.h"
 
-uint32_t fsmcInit = 0;
+#if defined(ARDUINO_ARCH_STM32)
+
+static uint32_t fsmcInit;
 
 void TOUCH_LCD_IO_Init(void) {
   if (fsmcInit) { return; }
@@ -101,3 +103,5 @@ void TOUCH_LCD_Reset(void) {
   digitalWrite(LCD_RESET_PIN, HIGH);
   delay (100);
 }
+
+#endif

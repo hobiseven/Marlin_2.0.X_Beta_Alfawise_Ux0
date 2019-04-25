@@ -11,6 +11,7 @@ notifications:
 # Cache PlatformIO packages using Travis CI container-based infrastructure
 sudo: false
 cache:
+  apt: true
   pip: true
   directories:
   - "~/.platformio"

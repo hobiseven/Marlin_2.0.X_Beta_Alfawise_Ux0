@@ -58,17 +58,15 @@ void ILI9341_Init(void) {
 
   /* Display ON command */
   ILI9341_DisplayOn();
-
 }
 
 void ILI9341_DisplayOn(void) {
   /* Display ON command */
-	LCD_IO_WriteReg(ILI9341_DISPLAY_ON);
+  LCD_IO_WriteReg(ILI9341_DISPLAY_ON);
 
   /* Sleep Out command */
-	LCD_IO_WriteReg(ILI9341_SLEEP_OUT);
+  LCD_IO_WriteReg(ILI9341_SLEEP_OUT);
 }
-
 
 void ILI9341_WriteRam(void) {
   LCD_IO_WriteReg(ILI9341_WRITE_RAM);

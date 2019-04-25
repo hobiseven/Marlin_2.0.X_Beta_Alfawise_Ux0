@@ -26,11 +26,9 @@
  * Communication interface for FSMC
  */
 
-//#if defined(ARDUINO_ARCH_STM32F1) && (defined(STM32_HIGH_DENSITY) || defined(STM32_XL_DENSITY))
-#if defined(ARDUINO_ARCH_STM32F1) //&& (defined(STM32_HIGH_DENSITY) || defined(STM32_XL_DENSITY))
-
-
 #include "../../inc/MarlinConfig.h"
+
+#if defined(ARDUINO_ARCH_STM32F1) && (defined(STM32_HIGH_DENSITY) || defined(STM32_XL_DENSITY))
 
 #if HAS_GRAPHICAL_LCD
 

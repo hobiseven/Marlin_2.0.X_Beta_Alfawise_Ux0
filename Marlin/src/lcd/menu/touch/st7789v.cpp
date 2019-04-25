@@ -83,17 +83,15 @@ void st7789v_Init(void) {
 
   /* Display ON command */
   st7789v_DisplayOn();
-
 }
 
 void st7789v_DisplayOn(void) {
   /* Display ON command */
-	LCD_IO_WriteReg(ST7789V_DISPLAY_ON);
+  LCD_IO_WriteReg(ST7789V_DISPLAY_ON);
 
   /* Sleep Out command */
-	LCD_IO_WriteReg(ST7789V_SLEEP_OUT);
+  LCD_IO_WriteReg(ST7789V_SLEEP_OUT);
 }
-
 
 void st7789v_WriteRam() {
   LCD_IO_WriteReg(ST7789V_WRITE_RAM);

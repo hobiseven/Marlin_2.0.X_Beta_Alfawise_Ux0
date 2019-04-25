@@ -1,10 +1,11 @@
 #include "../../../inc/MarlinConfigPre.h"
 
 #include <Arduino.h>
-#include <HardwareSerial.h>
-
 #include <stdio.h>
 #include "lcd.h"
+
+#if defined(ARDUINO_ARCH_STM32)
+#include <HardwareSerial.h>
 #include "xpt2046.h"
 
 #ifndef HEATER_BED_PIN
@@ -14,24 +15,22 @@
 #endif
 
 //#define STM32_HIGH_DENSITY
-
 // Force init to be called *first*, i.e. before static object allocation.
 // Otherwise, statically allocated objects that need libmaple may fail.
 // __attribute__(( constructor (101))) void premain() {
 //    init();
 //}
 
-uint16_t reg00, lcdId;
-
-int16_t xCalibration, yCalibration, xOffset, yOffset;
-
-uint32_t backlightTimeout;
-uint32_t ledTimeout = 0;
 uint16_t color = WHITE, bgColor = BLACK;
-char text[41];
-char controller[8];
+uint16_t reg00, lcdId = 0;
 
-void drawCross(uint16_t x, uint16_t y, uint16_t color) {
+static int16_t xCalibration, yCalibration, xOffset, yOffset;
+static uint32_t backlightTimeout;
+static uint32_t ledTimeout;
+static char text[41];
+static char controller[8];
+
+static void drawCross(uint16_t x, uint16_t y, uint16_t color) {
   lcdSetWindow(x - 15, y, x + 15, y); lcdFill(color, 31);
   lcdSetWindow(x, y - 15, x, y + 15); lcdFill(color, 31);
 }
@@ -322,6 +321,13 @@ void loop_calibration() {
   lcdSetWindow(x, y);
   LCD_IO_WriteData(color);
 }
+
+#else /* other arch */
+void do_calibration() {}
+void loop_calibration() {}
+uint16_t color = WHITE, bgColor = BLACK;
+uint16_t reg00, lcdId = 0;
+#endif
 
 #if 0
 int main(void) {

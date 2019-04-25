@@ -1,8 +1,13 @@
+#include "../../../inc/MarlinConfigPre.h"
+
 #include <Arduino.h>
+#include <stdint.h>
+
+#if defined(ARDUINO_ARCH_STM32)
+
 #include <libmaple/fsmc.h>
 #include <libmaple/gpio.h>
 #include <libmaple/dma.h>
-#include <stdint.h>
 
 #define __IO volatile
 #define __ASM __asm
@@ -67,7 +72,23 @@ void TOUCH_LCD_BacklightOn(void);
 void TOUCH_LCD_BacklightOff(void);
 void TOUCH_LCD_Reset(void);
 
-#define LCD_IO_Init() TOUCH_LCD_IO_Init()
+#else // ARDUINO_ARCH_STM32
+
+#define TOUCH_LCD_IO_Init()
+#define TOUCH_LCD_IO_WriteData(r)
+#define TOUCH_LCD_IO_WriteReg(r)
+#define TOUCH_LCD_IO_ReadData()
+#define TOUCH_LCD_IO_ReadData(x)
+#define TOUCH_LCD_IO_ReadData(r,s)
+#define TOUCH_LCD_Delay(m)
+#define TOUCH_LCD_BacklightOn()
+#define TOUCH_LCD_BacklightOff()
+#define TOUCH_LCD_Reset()
+
+#endif
+
+// Rename to avoid conflict with STM32 component
+#define LCD_IO_Init()       TOUCH_LCD_IO_Init()
 #define LCD_IO_WriteData(r) TOUCH_LCD_IO_WriteData(r)
 #define LCD_IO_WriteReg(r)  TOUCH_LCD_IO_WriteReg(r)
 #define LCD_IO_ReadData     TOUCH_LCD_IO_ReadData
