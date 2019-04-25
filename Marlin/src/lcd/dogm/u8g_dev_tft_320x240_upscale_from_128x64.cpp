@@ -61,7 +61,7 @@
 
 #include "U8glib.h"
 #include "HAL_LCD_com_defines.h"
-#include "string.h"
+#include <string.h>
 
 #define WIDTH 128
 #define HEIGHT 64
@@ -75,6 +75,56 @@
 #define LCD_COLUMN      0x2A   /* Colomn address register */
 #define LCD_ROW         0x2B   /* Row address register */
 #define LCD_WRITE_RAM   0x2C
+
+static const uint8_t sd_logo[] = {
+   B00000000,B00000000,
+   B01110011,B11000000,
+   B10001001,B00100000,
+   B10000001,B00100000,
+   B01110001,B00100000,
+   B00001001,B00100000,
+   B10001001,B00100000,
+   B01110011,B11000000,
+};
+
+static const uint8_t usb_logo[] = {
+   B00000000,B00000000,B00000000,
+   B10001001,B11001111,B00000000,
+   B10001010,B00101000,B10000000,
+   B10001010,B00001000,B10000000,
+   B10001001,B11001111,B00000000,
+   B10001000,B00101000,B10000000,
+   B10001010,B00101000,B10000000,
+   B01110001,B11001111,B00000000,
+};
+
+
+// see https://ee-programming-notepad.blogspot.com/2016/10/16-bit-color-generator-picker.html
+
+#define COLOR_BLACK 0x0000
+#define COLOR_WHITE 0xFFFF
+#define COLOR_BLUE  0x21DD
+#define COLOR_RED   0xF800
+#define COLOR_DARK  0x0003 // Some dark color
+
+#ifndef TFT_MARLINUI_COLOR
+#define TFT_MARLINUI_COLOR COLOR_WHITE
+#endif
+#ifndef TFT_MARLINBG_COLOR
+#define TFT_MARLINBG_COLOR COLOR_BLACK
+#endif
+#ifndef TFT_TOPICONS_COLOR
+#define TFT_TOPICONS_COLOR COLOR_BLUE
+#endif
+#ifndef TFT_DISABLED_COLOR
+#define TFT_DISABLED_COLOR COLOR_DARK
+#endif
+#ifndef TFT_BTSLEFT_COLOR
+#define TFT_BTSLEFT_COLOR COLOR_BLUE
+#endif
+#ifndef TFT_BTRIGHT_COLOR
+#define TFT_BTRIGHT_COLOR COLOR_RED
+#endif
 
 static uint32_t lcd_id = 0;
 
@@ -259,40 +309,6 @@ static const uint8_t button2[] = {
    B01111111,B11111111,B11111111,B11111111,B11111110,
 };
 
-static const uint8_t sd_logo[] = {
-   B00000000,B00000000,
-   B01110011,B11000000,
-   B10001001,B00100000,
-   B10000001,B00100000,
-   B01110001,B00100000,
-   B00001001,B00100000,
-   B10001001,B00100000,
-   B01110011,B11000000,
-};
-
-static const uint8_t usb_logo[] = {
-   B00000000,B00000000,B00000000,
-   B10001001,B11001111,B00000000,
-   B10001010,B00101000,B10000000,
-   B10001010,B00001000,B10000000,
-   B10001001,B11001111,B00000000,
-   B10001000,B00101000,B10000000,
-   B10001010,B00101000,B10000000,
-   B01110001,B11001111,B00000000,
-};
-
-//#define COLOR_BLUE  0x00D2
-#define COLOR_BLUE  0x2C5D
-#define COLOR_RED   0xF800
-#define COLOR_DARK  0x2124 // Dark grey
-
-#ifndef TFT_BTSLEFT_COLOR
-#define TFT_BTSLEFT_COLOR COLOR_BLUE
-#endif
-#ifndef TFT_BTRIGHT_COLOR
-#define TFT_BTRIGHT_COLOR COLOR_RED
-#endif
-
 void drawImage(const uint8_t *data, u8g_t *u8g, u8g_dev_t *dev,uint16_t length, uint16_t height, uint16_t color) {
   uint16_t i, j, k;
   uint16_t buffer[160];
@@ -310,6 +326,15 @@ void drawImage(const uint8_t *data, u8g_t *u8g, u8g_dev_t *dev,uint16_t length, 
     }
     u8g_WriteSequence(u8g, dev, length << 2, (uint8_t *)buffer);
     u8g_WriteSequence(u8g, dev, length << 2, (uint8_t *)buffer);
+  }
+}
+
+// used to fill RGB565 (16bits) background
+inline void memset2(const void *ptr, uint16_t fill, size_t cnt) {
+  uint16_t* wptr = (uint16_t*) ptr;
+  for (size_t i = 0; i < cnt; i += 2) {
+     *wptr = fill;
+     wptr++;
   }
 }
 
@@ -331,7 +356,7 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
       if (lcd_id == 0x040404) return 0; // No connected display on FSMC
       if (lcd_id == 0xFFFFFF) return 0; // No connected display on SPI
 
-      memset(buffer, 0x00, sizeof(buffer));
+      memset2(buffer, TFT_MARLINBG_COLOR, sizeof(buffer));
 
       if ((lcd_id & 0xFFFF) == 0x8552)  // ST7789V
         u8g_WriteEscSeqP(u8g, dev, st7789v_init_sequence);
@@ -344,12 +369,12 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
 
       // bottom line and buttons
 
-      for (i = 0; i < 150; i++) buffer[i] = COLOR_DARK;
+      for (i = 0; i < 150; i++) buffer[i] = TFT_DISABLED_COLOR;
       u8g_WriteEscSeqP(u8g, dev, separation_line_sequence_left);
       for (i = 0; i < 4; i++)
         u8g_WriteSequence(u8g, dev, 150, (uint8_t *)buffer);
 
-      for (i = 0; i < 150; i++) buffer[i] = COLOR_DARK;
+      for (i = 0; i < 150; i++) buffer[i] = TFT_DISABLED_COLOR;
       u8g_WriteEscSeqP(u8g, dev, separation_line_sequence_right);
       for (i = 0; i < 4; i++)
         u8g_WriteSequence(u8g, dev, 150, (uint8_t *)buffer);
@@ -375,10 +400,10 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
       usb = usb_serial_connected;
       //if (ui.on_status_screen()) {
         u8g_WriteEscSeqP(u8g, dev, sd_sequence);
-        drawImage(sd_logo, u8g, dev, 16, 8, sd ? COLOR_BLUE : COLOR_DARK);
+        drawImage(sd_logo, u8g, dev, 16, 8, sd ? TFT_TOPICONS_COLOR : TFT_DISABLED_COLOR);
 
         u8g_WriteEscSeqP(u8g, dev, usb_sequence);
-        drawImage(usb_logo, u8g, dev, 24, 8, usb ? COLOR_BLUE : COLOR_DARK);
+        drawImage(usb_logo, u8g, dev, 24, 8, usb ? TFT_TOPICONS_COLOR : TFT_DISABLED_COLOR);
       //}
 #endif
       u8g_WriteEscSeqP(u8g, dev, page_first_sequence);
@@ -389,7 +414,7 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
         uint32_t k = 0;
         for (i = 0; i < (uint32_t)pb->width; i++) {
           const uint8_t b = *(((uint8_t *)pb->buf) + i);
-          const uint16_t c = TEST(b, y) ? 0x7FFF : 0x0000;
+          const uint16_t c = TEST(b, y) ? TFT_MARLINUI_COLOR : TFT_MARLINBG_COLOR;
           buffer[k++] = c; buffer[k++] = c;
         }
         for (k = 0; k < 2; k++) {
