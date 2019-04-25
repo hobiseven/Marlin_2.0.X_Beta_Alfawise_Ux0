@@ -1308,6 +1308,14 @@
   #define MSG_MAZE                            _UxGT("Maze")
 #endif
 
+/* ALFAWISE STM32 */
+#ifndef MSG_TOUCHSCREEN
+  #define MSG_TOUCHSCREEN                     _UxGT("Touchscreen")
+#endif
+#ifndef MSG_CALIBRATION
+  #define MSG_CALIBRATION                     _UxGT("Calibration")
+#endif
+
 //
 // Filament Change screens show up to 3 lines on a 4-line display
 //                        ...or up to 2 lines on a 3-line display
