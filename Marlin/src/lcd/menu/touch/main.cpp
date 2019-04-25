@@ -1,17 +1,16 @@
 #include "../../../inc/MarlinConfigPre.h"
 
 #include <Arduino.h>
-#include <stdio.h>
 #include "lcd.h"
 
 #if defined(ARDUINO_ARCH_STM32)
-#include <HardwareSerial.h>
 #include "xpt2046.h"
 
 #ifndef HEATER_BED_PIN
 #define HEATER_BED_PIN PA8
 #define HEATER_0_PIN   PD3
 #define FAN_PIN       PA15
+#define LED_PIN        PC2
 #endif
 
 //#define STM32_HIGH_DENSITY
@@ -44,8 +43,8 @@ void do_calibration() {
 
   uint16_t paul=0;
 
-  pinMode(PC2, OUTPUT); // initialize LED digital pin as an output on Longer3D LK1/LK2 boards
-  digitalWrite(PC2, HIGH);
+  pinMode(LED_PIN, OUTPUT); // initialize LED digital pin as an output on Longer3D LK1/LK2 boards
+  digitalWrite(LED_PIN, HIGH);
 
   // Set all heaters inactive, as well as Alfawise fan
   pinMode(HEATER_BED_PIN, OUTPUT);
@@ -293,10 +292,10 @@ void loop_calibration() {
   uint16_t x, y;
 
   if (ledTimeout < millis()) {
-    digitalWrite(PC2, LOW);
+    digitalWrite(LED_PIN, LOW);
     ledTimeout = millis() + 2000;
   } else if (ledTimeout < millis() + 1000) {
-    digitalWrite(PC2, HIGH);
+    digitalWrite(LED_PIN, HIGH);
   }
 
   if (backlightTimeout < millis()) {
@@ -325,17 +324,7 @@ void loop_calibration() {
 #else /* other arch */
 void do_calibration() {}
 void loop_calibration() {}
+
 uint16_t color = WHITE, bgColor = BLACK;
 uint16_t reg00, lcdId = 0;
-#endif
-
-#if 0
-int main(void) {
-    do_calibration();
-
-    while (1) {
-        loop_calibration();
-    }
-    return 0;
-}
 #endif
