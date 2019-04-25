@@ -40,7 +40,7 @@ uint16_t getTouchCoordinate_sw_SPI(uint8_t coordinate)
     data[i] = 0;
     for (uint32_t j=0x8000; j!=0x0000; j>>=1){
       digitalWrite(TP_SCK,0);
-      if (digitalRead(TP_MISO))  data[i]=( data[i] | j) ;
+      if (digitalRead(TP_MISO)) data[i]=(data[i] | j);
       digitalWrite(TP_SCK, 1);
     }
 
@@ -54,11 +54,11 @@ uint16_t getTouchCoordinate_sw_SPI(uint8_t coordinate)
   delta[2] = data[1] > data[2] ? data[1] - data[2] : data[2] - data[1];
 
   if (delta[0] <= delta[1] && delta[0] <= delta[2])
-    return (data[0] + data [1]) >> 1;
+    return (data[0] + data[1]) >> 1;
   if (delta[1] <= delta[2])
-    return (data[0] + data [2]) >> 1;
+    return (data[0] + data[2]) >> 1;
 
-  return (data[1] + data [2]) >> 1;
+  return (data[1] + data[2]) >> 1;
 }
 
 

@@ -46,24 +46,24 @@ uint8_t xpt2046_read_buttons()
 
 uint16_t getInTouch(uint8_t coordinate)
 {
+  uint16_t data[3], delta[3];
+
   coordinate |= XPT2046_CONTROL | XPT2046_DFR_MODE;
 
   OUT_WRITE(TOUCH_CS, 0);
 
-  uint16_t data[3], delta[3];
-
   for (uint16_t i = 0; i < 3 ; i++)
   {
-    for (uint16_t j=0x80; j>0x00; j>>=1){
+    for (uint16_t j=0x80; j>0x00; j>>=1) {
       OUT_WRITE(TOUCH_SCK,0);
       OUT_WRITE(TOUCH_MOSI,(bool)(coordinate & j));
       OUT_WRITE(TOUCH_SCK, 1);
     }
 
     data[i] = 0;
-    for (uint32_t j=0x8000; j!=0x0000; j>>=1){
+    for (uint32_t j=0x8000; j!=0x0000; j>>=1) {
       OUT_WRITE(TOUCH_SCK,0);
-      if (digitalRead(TOUCH_MISO))  data[i]=( data[i] | j) ;
+      if (digitalRead(TOUCH_MISO)) data[i]=(data[i] | j);
       OUT_WRITE(TOUCH_SCK, 1);
     }
 
@@ -73,13 +73,15 @@ uint16_t getInTouch(uint8_t coordinate)
 
   OUT_WRITE(TOUCH_CS, 1);
 
-  delta[0] = data[0] > data[1] ? data[0] - data [1] : data[1] - data [0];
-  delta[1] = data[0] > data[2] ? data[0] - data [2] : data[2] - data [0];
-  delta[2] = data[1] > data[2] ? data[1] - data [2] : data[2] - data [1];
+  delta[0] = data[0] > data[1] ? data[0] - data[1] : data[1] - data[0];
+  delta[1] = data[0] > data[2] ? data[0] - data[2] : data[2] - data[0];
+  delta[2] = data[1] > data[2] ? data[1] - data[2] : data[2] - data[1];
 
-  if (delta[0] <= delta[1] && delta[0] <= delta[2]) return (data[0] + data [1]) >> 1;
-  if (delta[1] <= delta[2]) return (data[0] + data [2]) >> 1;
+  if (delta[0] <= delta[1] && delta[0] <= delta[2])
+    return (data[0] + data[1]) >> 1;
+  if (delta[1] <= delta[2])
+    return (data[0] + data[2]) >> 1;
 
-  return (data[1] + data [2]) >> 1;
+  return (data[1] + data[2]) >> 1;
 }
 
