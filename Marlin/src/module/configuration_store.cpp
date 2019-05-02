@@ -37,7 +37,7 @@
  */
 
 // Change EEPROM version if the structure changes
-#define EEPROM_VERSION "V64"
+#define EEPROM_VERSION "V65"
 #define EEPROM_OFFSET 100
 
 // Check the integrity of data offsets.
@@ -291,12 +291,14 @@ typedef struct SettingsDataStruct {
   // Tool-change settings
   //
   #if EXTRUDERS > 1
-  toolchange_settings_t toolchange_settings;            // M217 S P R
+    toolchange_settings_t toolchange_settings;            // M217 S P R
   #endif
 
 } SettingsData;
 
 MarlinSettings settings;
+
+//static_assert(sizeof(SettingsData) <= E2END + 1, "EEPROM too small to contain SettingsData!");
 
 uint16_t MarlinSettings::datasize() { return sizeof(SettingsData); }
 
@@ -1085,17 +1087,19 @@ void MarlinSettings::postprocess() {
     //
     {
       #if DISABLED(ADVANCED_PAUSE_FEATURE)
-      const fil_change_settings_t fc_settings[EXTRUDERS] = { 0, 0 };
+        const fil_change_settings_t fc_settings[EXTRUDERS] = { 0, 0 };
       #endif
       _FIELD_TEST(fc_settings);
       EEPROM_WRITE(fc_settings);
     }
 
-    // Runout sensor (on/off)
+    //
+    // Filament Runout Sensor
+    //
     {
       bool runout_sensor_enabled = false;
       #if HAS_FILAMENT_SENSOR
-      runout_sensor_enabled = runout.enabled;
+        runout_sensor_enabled = runout.enabled;
       #endif
       _FIELD_TEST(runout_sensor_enabled);
       EEPROM_WRITE(runout_sensor_enabled);
@@ -1818,13 +1822,15 @@ void MarlinSettings::postprocess() {
         EEPROM_READ(fc_settings);
       }
 
-      // Runout sensor (on/off)
+      //
+      // Filament Runout Sensor
+      //
       {
-        bool runout_sensor_enabled = false;
+        bool runout_sensor_enabled;
         _FIELD_TEST(runout_sensor_enabled);
         EEPROM_READ(runout_sensor_enabled);
         #if HAS_FILAMENT_SENSOR
-        runout.enabled = runout_sensor_enabled;
+          runout.enabled = runout_sensor_enabled;
         #endif
       }
 

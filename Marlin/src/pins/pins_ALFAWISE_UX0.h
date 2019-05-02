@@ -135,6 +135,9 @@
 // SPI1 (EEPROM W25Q64 + DAC OUT)
 //
 
+#undef E2END
+#define E2END              0x1FFF // EEPROM end address (8kB)
+
 //#define SPI_EEPROM          // If commented this will create a file on the SD card as a replacement
 #define SPI_CHAN_EEPROM1   1
 #define SPI_EEPROM1_CS     PC5
