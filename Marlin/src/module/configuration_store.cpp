@@ -1091,12 +1091,15 @@ void MarlinSettings::postprocess() {
       EEPROM_WRITE(fc_settings);
     }
 
-    bool runout_sensor_enabled = false;
-    #if HAS_FILAMENT_SENSOR
-    runout_sensor_enabled = runout.enabled;
-    #endif
-    _FIELD_TEST(runout_sensor_enabled);
-    EEPROM_WRITE(runout_sensor_enabled);
+    // Runout sensor (on/off)
+    {
+      bool runout_sensor_enabled = false;
+      #if HAS_FILAMENT_SENSOR
+      runout_sensor_enabled = runout.enabled;
+      #endif
+      _FIELD_TEST(runout_sensor_enabled);
+      EEPROM_WRITE(runout_sensor_enabled);
+    }
 
     //
     // Multiple Extruders
