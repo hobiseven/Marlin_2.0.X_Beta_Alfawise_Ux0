@@ -142,6 +142,11 @@ typedef struct SettingsDataStruct {
   #endif
 
   //
+  // FILAMENT_RUNOUT_SENSOR
+  //
+  bool runout_sensor_enabled;                           // M412 S
+
+  //
   // ENABLE_LEVELING_FADE_HEIGHT
   //
   float planner_z_fade_height;                          // M420 Zn  planner.z_fade_height
@@ -283,22 +288,17 @@ typedef struct SettingsDataStruct {
   fil_change_settings_t fc_settings[EXTRUDERS];         // M603 T U L
 
   //
-  // FILAMENT_RUNOUT_SENSOR
-  //
-  bool runout_sensor_enabled;                           // M412 S
-
-  //
   // Tool-change settings
   //
   #if EXTRUDERS > 1
-    toolchange_settings_t toolchange_settings;            // M217 S P R
+    toolchange_settings_t toolchange_settings;          // M217 S P R
   #endif
 
 } SettingsData;
 
-MarlinSettings settings;
-
 //static_assert(sizeof(SettingsData) <= E2END + 1, "EEPROM too small to contain SettingsData!");
+
+MarlinSettings settings;
 
 uint16_t MarlinSettings::datasize() { return sizeof(SettingsData); }
 
@@ -516,6 +516,18 @@ void MarlinSettings::postprocess() {
         // Skip hotend 0 which must be 0
         for (uint8_t e = 1; e < HOTENDS; e++)
           LOOP_XYZ(i) EEPROM_WRITE(hotend_offset[i][e]);
+      #endif
+    }
+
+    //
+    // Filament Runout Sensor
+    //
+    {
+      #if HAS_FILAMENT_SENSOR
+        EEPROM_WRITE(runout.enabled);
+      #else
+        const bool runout_sensor_enabled = false;
+        EEPROM_WRITE(runout_sensor_enabled);
       #endif
     }
 
@@ -1094,18 +1106,6 @@ void MarlinSettings::postprocess() {
     }
 
     //
-    // Filament Runout Sensor
-    //
-    {
-      bool runout_sensor_enabled = false;
-      #if HAS_FILAMENT_SENSOR
-        runout_sensor_enabled = runout.enabled;
-      #endif
-      _FIELD_TEST(runout_sensor_enabled);
-      EEPROM_WRITE(runout_sensor_enabled);
-    }
-
-    //
     // Multiple Extruders
     //
 
@@ -1249,6 +1249,19 @@ void MarlinSettings::postprocess() {
           // Skip hotend 0 which must be 0
           for (uint8_t e = 1; e < HOTENDS; e++)
             LOOP_XYZ(i) EEPROM_READ(hotend_offset[i][e]);
+        #endif
+      }
+
+      //
+      // Filament Runout Sensor
+      //
+      {
+        _FIELD_TEST(runout_sensor_enabled);
+        #if HAS_FILAMENT_SENSOR
+          EEPROM_READ(runout.enabled);
+        #else
+          bool runout_sensor_enabled;
+          EEPROM_READ(runout_sensor_enabled);
         #endif
       }
 
@@ -1823,18 +1836,6 @@ void MarlinSettings::postprocess() {
       }
 
       //
-      // Filament Runout Sensor
-      //
-      {
-        bool runout_sensor_enabled;
-        _FIELD_TEST(runout_sensor_enabled);
-        EEPROM_READ(runout_sensor_enabled);
-        #if HAS_FILAMENT_SENSOR
-          runout.enabled = runout_sensor_enabled;
-        #endif
-      }
-
-      //
       // Tool-change settings
       //
       #if EXTRUDERS > 1
@@ -2325,6 +2326,7 @@ void MarlinSettings::reset() {
 
   DEBUG_ECHO_START();
   DEBUG_ECHOLNPGM("Hardcoded Default Settings Loaded");
+
 }
 
 #if DISABLED(DISABLE_M503)
@@ -2555,6 +2557,12 @@ void MarlinSettings::reset() {
         );
         SERIAL_ECHOLNPAIR_F(" Z", LINEAR_UNIT(hotend_offset[Z_AXIS][e]), 3);
       }
+    #endif
+
+    #if HAS_FILAMENT_SENSOR
+      CONFIG_ECHO_HEADING("Filament Runout Sensor:");
+      CONFIG_ECHO_START();
+      SERIAL_ECHOLNPAIR("  M412 S", int(runout.enabled));
     #endif
 
     /**
