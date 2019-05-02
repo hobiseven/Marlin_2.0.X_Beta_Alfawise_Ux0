@@ -526,7 +526,7 @@ void MarlinSettings::postprocess() {
       #if HAS_FILAMENT_SENSOR
         EEPROM_WRITE(runout.enabled);
       #else
-        const bool runout_sensor_enabled = false;
+        const bool runout_sensor_enabled = true;
         EEPROM_WRITE(runout_sensor_enabled);
       #endif
     }
@@ -2069,6 +2069,19 @@ void MarlinSettings::reset() {
     reset_hotend_offsets();
   #endif
 
+  //
+  // Filament Runout Sensor
+  //
+
+  #if HAS_FILAMENT_SENSOR
+    runout.enabled = true;
+    runout.reset();
+  #endif
+
+  //
+  // Tool-change Settings
+  //
+
   #if EXTRUDERS > 1
     #if ENABLED(TOOLCHANGE_FILAMENT_SWAP)
       toolchange_settings.swap_length = TOOLCHANGE_FIL_SWAP_LENGTH;
@@ -2080,6 +2093,10 @@ void MarlinSettings::reset() {
     #endif
     toolchange_settings.z_raise = TOOLCHANGE_ZRAISE;
   #endif
+
+  //
+  // Magnetic Parking Extruder
+  //
 
   #if ENABLED(MAGNETIC_PARKING_EXTRUDER)
     mpe_settings_init();
