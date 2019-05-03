@@ -95,12 +95,12 @@
 #define BTN_EN1            -1
 #define BTN_EN2            -1
 
-//#define POWER_LOSS_PIN     PA2   // PW_DET
-//#define PS_ON_PIN          PA3   // PW_OFF
+//#define POWER_LOSS_PIN     PA2   // PW_DET (Serial 2)
+//#define PS_ON_PIN          PA3   // PW_OFF (Serial 2)
 
 #define FIL_RUNOUT_PIN       PC0  // MT_DET >> X Max plug on PCB used as filament runout sensor on Alfawise boards
 
-//#define BEEPER_PIN         PC13
+//#define BEEPER_PIN         PD13 // PD13 or 60 (Servo Pin 1 with NPN 5V output on Board V0G+)
 
 #define LED_PIN            PC2 // PC2 or 17
 
@@ -136,7 +136,7 @@
 //
 
 #undef E2END
-#define E2END              0x1FFF // EEPROM end address (8kB)
+#define E2END              0x1FFF // EEPROM end address (reserve 8kB, but real size is 8MB/64Mbits)
 
 //#define SPI_EEPROM          // If commented this will create a file on the SD card as a replacement
 #define SPI_CHAN_EEPROM1   1

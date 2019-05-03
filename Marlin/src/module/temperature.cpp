@@ -86,17 +86,17 @@ Temperature thermalManager;
  */
 
 #if HAS_HEATED_BED
-  #define _BED_PSTR(E) (E) == -1 ? PSTR(MSG ## _BED) :
+  #define _BED_PSTR(M,E) (E) == -1 ? PSTR(M) :
 #else
-  #define _BED_PSTR(E)
+  #define _BED_PSTR(M,E)
 #endif
 #if HAS_HEATED_CHAMBER
-  #define _CHAMBER_PSTR(E) (E) == -2 ? PSTR(MSG ## _CHAMBER) :
+  #define _CHAMBER_PSTR(M,E) (E) == -2 ? PSTR(M) :
 #else
-  #define _CHAMBER_PSTR(E)
+  #define _CHAMBER_PSTR(M,E)
 #endif
-#define _E_PSTR(M,E,N) (HOTENDS >= (N) && (E) == (N)-1) ? PSTR(MSG_E##N " " M) :
-#define TEMP_ERR_PSTR(M,E) _BED_PSTR(E) _CHAMBER_PSTR(E) _E_PSTR(M,E,2) _E_PSTR(M,E,3) _E_PSTR(M,E,4) _E_PSTR(M,E,5) _E_PSTR(M,E,6) PSTR(MSG_E1 " " M)
+#define _E_PSTR(M,E,N) ((HOTENDS) >= (N) && (E) == (N)-1) ? PSTR(MSG_E##N " " M) :
+#define TEMP_ERR_PSTR(M,E) _BED_PSTR(M##_BED,E) _CHAMBER_PSTR(M##_CHAMBER,E) _E_PSTR(M,E,2) _E_PSTR(M,E,3) _E_PSTR(M,E,4) _E_PSTR(M,E,5) _E_PSTR(M,E,6) PSTR(MSG_E1 " " M)
 
 // public:
 
@@ -944,11 +944,29 @@ void Temperature::manage_heater() {
     if (temp_hotend[1].current < MAX(HEATER_1_MINTEMP, HEATER_1_MAX6675_TMIN + .01)) min_temp_error(1);
   #endif
 
-  #if WATCH_HOTENDS || WATCH_BED || DISABLED(PIDTEMPBED) || HAS_AUTO_FAN || HEATER_IDLE_HANDLER || WATCH_CHAMBER
+  #define HAS_THERMAL_PROTECTION (ENABLED(THERMAL_PROTECTION_HOTENDS) || HAS_THERMALLY_PROTECTED_BED || ENABLED(THERMAL_PROTECTION_CHAMBER))
+
+  #if HAS_THERMAL_PROTECTION || DISABLED(PIDTEMPBED) || HAS_AUTO_FAN || HEATER_IDLE_HANDLER
     millis_t ms = millis();
   #endif
 
+  #if HAS_THERMAL_PROTECTION
+    #ifndef THERMAL_PROTECTION_GRACE_PERIOD
+      #define THERMAL_PROTECTION_GRACE_PERIOD 0 // No grace period needed on well-behaved boards
+    #endif
+    #if THERMAL_PROTECTION_GRACE_PERIOD > 0
+      static millis_t grace_period = ms + THERMAL_PROTECTION_GRACE_PERIOD;
+      if (ELAPSED(ms, grace_period)) grace_period = 0UL;
+    #else
+      static constexpr millis_t grace_period = 0UL;
+    #endif
+  #endif
+
   HOTEND_LOOP() {
+    #if ENABLED(THERMAL_PROTECTION_HOTENDS)
+      if (!grace_period && degHotend(e) > temp_range[e].maxtemp)
+        _temp_error(e, PSTR(MSG_T_THERMAL_RUNAWAY), TEMP_ERR_PSTR(MSG_THERMAL_RUNAWAY, e));
+    #endif
 
     #if HEATER_IDLE_HANDLER
       hotend_idle[e].update(ms);
@@ -1000,6 +1018,11 @@ void Temperature::manage_heater() {
   #endif // FILAMENT_WIDTH_SENSOR
 
   #if HAS_HEATED_BED
+
+    #if ENABLED(THERMAL_PROTECTION_BED)
+      if (!grace_period && degBed() > BED_MAXTEMP)
+        _temp_error(-1, PSTR(MSG_T_THERMAL_RUNAWAY), TEMP_ERR_PSTR(MSG_THERMAL_RUNAWAY, -1));
+    #endif
 
     #if WATCH_BED
       // Make sure temperature is increasing
@@ -1070,6 +1093,11 @@ void Temperature::manage_heater() {
     #endif
 
     #if HAS_HEATED_CHAMBER
+
+      #if ENABLED(THERMAL_PROTECTION_CHAMBER)
+        if (!grace_period && degChamber() > CHAMBER_MAXTEMP)
+          _temp_error(-2, PSTR(MSG_T_THERMAL_RUNAWAY), TEMP_ERR_PSTR(MSG_THERMAL_RUNAWAY, -2));
+      #endif
 
       #if WATCH_CHAMBER
         // Make sure temperature is increasing
@@ -1619,7 +1647,7 @@ void Temperature::init() {
   }
 #endif
 
-#if ENABLED(THERMAL_PROTECTION_HOTENDS) || HAS_THERMALLY_PROTECTED_BED || ENABLED(THERMAL_PROTECTION_CHAMBER)
+#if HAS_THERMAL_PROTECTION
 
   #if ENABLED(THERMAL_PROTECTION_HOTENDS)
     Temperature::tr_state_machine_t Temperature::tr_state_machine[HOTENDS]; // = { { TRInactive, 0 } };
@@ -1636,17 +1664,17 @@ void Temperature::init() {
     static float tr_target_temperature[HOTENDS + 1] = { 0.0 };
 
     /**
-        SERIAL_ECHO_START();
-        SERIAL_ECHOPGM("Thermal Thermal Runaway Running. Heater ID: ");
-        if (heater_id == -2) SERIAL_ECHOPGM("chamber");
-        if (heater_id < 0) SERIAL_ECHOPGM("bed"); else SERIAL_ECHO(heater_id);
-        SERIAL_ECHOPAIR(" ;  State:", sm.state, " ;  Timer:", sm.timer, " ;  Temperature:", current, " ;  Target Temp:", target);
-        if (heater_id >= 0)
-          SERIAL_ECHOPAIR(" ;  Idle Timeout:", hotend_idle[heater_id].timed_out);
-        else
-          SERIAL_ECHOPAIR(" ;  Idle Timeout:", bed_idle.timed_out);
-        SERIAL_EOL();
-    */
+      SERIAL_ECHO_START();
+      SERIAL_ECHOPGM("Thermal Thermal Runaway Running. Heater ID: ");
+      if (heater_id == -2) SERIAL_ECHOPGM("chamber");
+      if (heater_id < 0) SERIAL_ECHOPGM("bed"); else SERIAL_ECHO(heater_id);
+      SERIAL_ECHOPAIR(" ;  State:", sm.state, " ;  Timer:", sm.timer, " ;  Temperature:", current, " ;  Target Temp:", target);
+      if (heater_id >= 0)
+        SERIAL_ECHOPAIR(" ;  Idle Timeout:", hotend_idle[heater_id].timed_out);
+      else
+        SERIAL_ECHOPAIR(" ;  Idle Timeout:", bed_idle.timed_out);
+      SERIAL_EOL();
+    //*/
 
     const int heater_index = heater_id >= 0 ? heater_id : HOTENDS;
 
@@ -2664,7 +2692,7 @@ void Temperature::isr() {
     void Temperature::set_heating_message(const uint8_t e) {
       const bool heating = isHeatingHotend(e);
       #if HOTENDS > 1
-        ui.status_printf_P(0, heating ? PSTR("E%i " MSG_HEATING) : PSTR("E%i " MSG_COOLING), int(e + 1));
+        ui.status_printf_P(0, heating ? PSTR("E%c " MSG_HEATING) : PSTR("E%c " MSG_COOLING), '1' + e);
       #else
         ui.set_status_P(heating ? PSTR("E " MSG_HEATING) : PSTR("E " MSG_COOLING));
       #endif
@@ -2814,6 +2842,7 @@ void Temperature::isr() {
     ) {
       #if TEMP_BED_RESIDENCY_TIME > 0
         millis_t residency_start_ms = 0;
+        bool first_loop = true;
         // Loop until the temperature has stabilized
         #define TEMP_BED_CONDITIONS (!residency_start_ms || PENDING(now, residency_start_ms + (TEMP_BED_RESIDENCY_TIME) * 1000UL))
       #else
@@ -2822,7 +2851,7 @@ void Temperature::isr() {
       #endif
 
       float target_temp = -1, old_temp = 9999;
-      bool wants_to_cool = false, first_loop = true;
+      bool wants_to_cool = false;
       wait_for_heatup = true;
       millis_t now, next_temp_ms = 0, next_cool_check_ms = 0;
 
@@ -2906,7 +2935,9 @@ void Temperature::isr() {
           }
         #endif
 
-        first_loop = false;
+        #if TEMP_BED_RESIDENCY_TIME > 0
+          first_loop = false;
+        #endif
 
       } while (wait_for_heatup && TEMP_BED_CONDITIONS);
 

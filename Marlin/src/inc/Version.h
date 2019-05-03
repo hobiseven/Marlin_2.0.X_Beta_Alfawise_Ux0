@@ -44,14 +44,14 @@
    * Verbose version identifier which should contain a reference to the location
    * from where the binary was downloaded or the source code was compiled.
    */
-  #define DETAILED_BUILD_VERSION SHORT_BUILD_VERSION " Git Pull 14/04/2019 + JMZ52 code + Hobi code"
+  #define DETAILED_BUILD_VERSION SHORT_BUILD_VERSION " + JMZ52 & Hobi code"
 
   /**
    * The STRING_DISTRIBUTION_DATE represents when the binary file was built,
    * here we define this default string as the date where the latest release
    * version was tagged.
    */
-  #define STRING_DISTRIBUTION_DATE "2019-05-03"
+  #define STRING_DISTRIBUTION_DATE "2019-05-02"
 
   /**
    * Required minimum Configuration.h and Configuration_adv.h file versions.

@@ -76,7 +76,6 @@
 // https://www.lesimprimantes3d.fr/forum/topic/18260-alfawise-u20x-u30-marlin-2x-firmware-alternatif/
 //
 // 1 - Select your Alfawise U30 or U20 or U20+printer, but ONLY ONE!!
-
 //     U20_PLUS  is not tested, as we do not have a printer to test.
 //     Print bed PID settings MUST be tuned
 
@@ -108,8 +107,6 @@
 //#define TFT_BTSLEFT_COLOR  0xDEE6 // 11011 110111 00110 Yellow
 //#define TFT_BTRIGHT_COLOR  0x145F // 00010 100010 11111 Cyan
 
-
-
 //===========================================================================
 //============================= @section info ===============================
 //===========================================================================
@@ -118,7 +115,7 @@
 // User-specified version info of this build to display in [Pronterface, etc] terminal window during
 // startup. Implementation of an idea by Prof Braino to inform user that any changes made to this
 // build by the user have been successfully uploaded into firmware.
-#define STRING_CONFIG_H_AUTHOR "Hobi, Alfawise Ux0" // Who made the changes.
+#define STRING_CONFIG_H_AUTHOR "Hobi, tpruvot"  // Who made the changes.
 #define SHOW_BOOTSCREEN
 #define STRING_SPLASH_LINE1 SHORT_BUILD_VERSION // will be shown during bootup in line 1
 #define STRING_SPLASH_LINE2 WEBSITE_URL         // will be shown during bootup in line 2
@@ -189,8 +186,6 @@
 #define CUSTOM_MACHINE_NAME "Alfawise U30"
 #elif defined(U20_PLUS)
 #define CUSTOM_MACHINE_NAME "Alfawise U20+"
-#else
-#define CUSTOM_MACHINE_NAME "3D Printer"
 #endif
 
 // Define this to set a unique identifier for this printer, (Used by some programs to differentiate between machines)
@@ -490,12 +485,10 @@
 // PID Tuning Guide here: http://reprap.org/wiki/PID_Tuning
 
 // Comment the following line to disable PID and enable bang-bang.
-
 #define PIDTEMP
 #define BANG_MAX 255     // Limits current to nozzle while in bang-bang mode; 255=full current
 #define PID_MAX BANG_MAX // Limits current to nozzle while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current
 #define PID_K1 0.95      // Smoothing factor within any PID loop
-
 #if ENABLED(PIDTEMP)
   //#define PID_EDIT_MENU         // Add PID editing to the "Advanced Settings" menu. (~700 bytes of PROGMEM)
   //#define PID_AUTOTUNE_MENU     // Add PID auto-tuning to the "Advanced Settings" menu. (~250 bytes of PROGMEM)
@@ -1007,6 +1000,9 @@
 
 // Before deploy/stow pause for user confirmation
 //#define PAUSE_BEFORE_DEPLOY_STOW
+#if ENABLED(PAUSE_BEFORE_DEPLOY_STOW)
+  //#define PAUSE_PROBE_DEPLOY_WHEN_TRIGGERED // For Manual Deploy Allenkey Probe
+#endif
 
 /**
  * Enable one or more of the following if probing seems unreliable.
@@ -2001,7 +1997,9 @@
 // FYSETC variant of the MINI12864 graphic controller with SD support
 // https://wiki.fysetc.com/Mini12864_Panel/?fbclid=IwAR1FyjuNdVOOy9_xzky3qqo_WeM5h-4gpRnnWhQr_O1Ef3h0AFnFXmCehK8
 //
-//#define FYSETC_MINI_12864
+//#define FYSETC_MINI_12864_1_2  // Type C/D/E/F. Simple RGB Backlight (always on)
+//#define FYSETC_MINI_12864_2_0  // Type A/B. Discreet RGB Backlight
+//#define FYSETC_MINI_12864_2_1  // Type A/B. Neopixel RGB Backlight
 
 //
 // Factory display for Creality CR-10
@@ -2135,6 +2133,7 @@
 // affecting heaters, and the fan if FAN_SOFT_PWM is enabled.
 // However, control resolution will be halved for each increment;
 // at zero value, there are 128 effective control positions.
+// :[0,1,2,3,4,5,6,7]
 #define SOFT_PWM_SCALE 0
 
 // If SOFT_PWM_SCALE is set to a value higher than 0, dithering can
@@ -2200,7 +2199,7 @@
 //#define NEOPIXEL_LED
 #if ENABLED(NEOPIXEL_LED)
   #define NEOPIXEL_TYPE   NEO_GRBW // NEO_GRBW / NEO_GRB - four/three channel driver type (defined in Adafruit_NeoPixel.h)
-  #define NEOPIXEL_PIN    4        // LED driving pin on motherboard 4 => D4 (EXP2-5 on Printrboard) / 30 => PC7 (EXP3-13 on Rumba)
+  #define NEOPIXEL_PIN    4        // LED driving pin
   #define NEOPIXEL_PIXELS 30       // Number of LEDs in the strip
   #define NEOPIXEL_IS_SEQUENTIAL   // Sequential display for temperature change - LED by LED. Disable to change all LEDs at once.
   #define NEOPIXEL_BRIGHTNESS 127  // Initial brightness (0-255)

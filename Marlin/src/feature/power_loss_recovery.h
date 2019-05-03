@@ -32,15 +32,30 @@
   #include "../feature/mixing.h"
 #endif
 
-#define SAVE_INFO_INTERVAL_MS 0
-//#define SAVE_EACH_CMD_MODE
 //#define DEBUG_POWER_LOSS_RECOVERY
+//#define SAVE_EACH_CMD_MODE
+#ifndef SAVE_INFO_INTERVAL_MS
+#define SAVE_INFO_INTERVAL_MS 0
+#endif
+#ifndef POWER_LOSS_PURGE_LEN
+#define POWER_LOSS_PURGE_LEN 20
+#endif
+#ifndef POWER_LOSS_RETRACT_LEN
+#define POWER_LOSS_RETRACT_LEN 10
+#endif
 
 typedef struct {
   uint8_t valid_head;
 
   // Machine state
   float current_position[NUM_AXIS];
+
+  #if HAS_HOME_OFFSET
+    float home_offset[XYZ];
+  #endif
+  #if HAS_POSITION_SHIFT
+    float position_shift[XYZ];
+  #endif
 
   uint16_t feedrate;
 

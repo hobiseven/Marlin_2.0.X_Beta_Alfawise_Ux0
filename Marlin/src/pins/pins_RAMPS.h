@@ -436,7 +436,9 @@
       #endif
 
       #define BTN_ENC           35
-      #define SD_DETECT_PIN     49
+      #ifndef SD_DETECT_PIN
+        #define SD_DETECT_PIN   49
+      #endif
       #define KILL_PIN          41
 
       #if ENABLED(BQ_LCD_SMART_CONTROLLER)
@@ -526,7 +528,6 @@
 
       // From https://wiki.fysetc.com/Mini12864_Panel/?fbclid=IwAR1FyjuNdVOOy9_xzky3qqo_WeM5h-4gpRnnWhQr_O1Ef3h0AFnFXmCehK8
       #define BEEPER_PIN        37
-      #define LCD_RESET_PIN     23
 
       #define DOGLCD_A0         16
       #define DOGLCD_CS         17
@@ -537,14 +538,21 @@
 
       #define SD_DETECT_PIN     49
 
-      #ifndef RGB_LED_R_PIN
-        #define RGB_LED_R_PIN   25
-      #endif
-      #ifndef RGB_LED_G_PIN
-        #define RGB_LED_G_PIN   27
-      #endif
-      #ifndef RGB_LED_B_PIN
-        #define RGB_LED_B_PIN   29
+      #define LCD_RESET_PIN     23   // Must be high or open for LCD to operate normally.
+                                     // Seems to work best if left open.
+
+      #if EITHER(FYSETC_MINI_12864_1_2, FYSETC_MINI_12864_2_0)
+        #ifndef RGB_LED_R_PIN
+          #define RGB_LED_R_PIN 25
+        #endif
+        #ifndef RGB_LED_G_PIN
+          #define RGB_LED_G_PIN 27
+        #endif
+        #ifndef RGB_LED_B_PIN
+          #define RGB_LED_B_PIN 29
+        #endif
+      #elif ENABLED(FYSETC_MINI_12864_2_1)
+        #define NEOPIXEL_PIN    25
       #endif
 
     #elif ENABLED(MINIPANEL)
