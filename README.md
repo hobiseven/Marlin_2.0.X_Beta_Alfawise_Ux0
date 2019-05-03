@@ -2,7 +2,7 @@
 
 This is the initial commit of the Marlin 2.0.X code port to Alfawise Ux0 boards. ONLY COMPILES with STM32 5.3.0 Libs or above
 
-This is based on a Marlin2.0.x_bugfix pull 14th April 2019 + custom code modified from JMZ52 + Hobi code specific for Alfawise
+This is based on a Marlin2.0.x_bugfix pull 14th April 2019 + custom code modified from JMZ52 + Hobi code specific for Alfawise. Marlin code has then be synched to 03rd May 2019, and they have already merged a part of our common changes.
 
 To build the code, you need to install Vscode + Platformio. Detailled tutorial in French available at that URL :
 
@@ -22,11 +22,14 @@ designer mixed pins MOSI and MISO while routing the board
 - Disabled JTAG debug, but kept ST Link debug capability/SWD
 - Use the original Alfawise bootloader to update from SD Card.
   For STLink flash, please comment the py script in platformio.ini and rebuild.
+- Integrated touchscreen calibration in Configuration/Touchscreen menu (to get your values)
+- Fixed the runout sensor
 
 ## To be done
 
-- Change soft PWM on Fan_pin to real PWM, but this needs carefull afletnate mapping of PA0 to PA15 to avoid Timer 2 conflict with PWM
-- Potentially update the touch screen calibration parameters in `Config.h`. Use the alfawise toolkit to generate touch calibration data.
+- Store the calibration results directly in settings
+- Include some Z Probes configuration samples
+- Fix the Powerloss recovery resume (seems a Marlin bug for now)
 
 ## Configuration
 
@@ -34,7 +37,7 @@ designer mixed pins MOSI and MISO while routing the board
 - 1 heater bed with 1 temperature probe. U20 or U30 flag to be set at the beginning of config.h
 - 4 drivers type A4998 for the 3 axis + extruder
 - Homing on X,Y,Z on (-) direction. No Xmax,Ymax and Zmax declared.
-- Filament detection has been assigned to Xmax pins, but unused. Users can modify and use this.
+- Filament detection has been assigned to Xmax pin, like the alfawise fw. Users can modify and use this.
 - SD-Card support for the code.
 - 2 serial ports running at 250,000 baud (on the alfawise USB port, which is directly connected to STM32 CPU)
 - Support in theory only 2 types of LCD screen : ILI9341, ST7798V. However Alfawise Ux0 printers may have 6 different types of screens.
