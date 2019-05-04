@@ -2063,13 +2063,7 @@
 //=============================================================================
 
 #define TOUCHSCREEN
-
-// Calibration data coming from external calibration software package
-// Alfawise_Ux0_LCD_Touch_Toolkit
-
-
-
-#if ENABLED(TOUCHSCREEN)
+#if ENABLED(TOUCHSCREEN) || ENABLED(TOUCH_BUTTONS)
 
   #if ENABLED(TS_V11)
   // Alfawise Ux0 ILI9341 2.8 TP Ver 1.1 / Green PCB ( on the back of touchscreen) */

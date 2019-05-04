@@ -35,8 +35,13 @@ void menu_touchscreen() {
 #else
   STATIC_ITEM("ILI9341 v1.2", false, false);
 #endif
-  STATIC_ITEM("X: " STRINGIFY(XPT2046_X_CALIBRATION) " " STRINGIFY(XPT2046_X_OFFSET), false);
-  STATIC_ITEM("Y: " STRINGIFY(XPT2046_Y_CALIBRATION) " " STRINGIFY(XPT2046_Y_OFFSET), false);
+  {
+    char line[16];
+    snprintf(line, 16, "X: %hd %hd", calibration.results[0], calibration.results[1]);
+    STATIC_ITEM(line, false, false);
+    snprintf(line, 16, "Y: %hd %hd", calibration.results[2], calibration.results[3]);
+    STATIC_ITEM(line, false, false);
+  }
   END_MENU();
 }
 

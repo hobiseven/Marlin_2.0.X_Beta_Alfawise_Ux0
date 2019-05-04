@@ -21,7 +21,6 @@
  */
 #pragma once
 
-#include "HAL.h"
 #include "../../lcd/ultralcd.h"
 
 // We rely on XPT2046 compatible mode to ADS7843, hence no Z1 and Z2 measurements possible.

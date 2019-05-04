@@ -27,7 +27,7 @@ void menu_touchscreen();
 void enter_touch_calibrate();
 
 // main.cpp
-void do_calibration();
+int16_t do_calibration(int16_t results[4]);
 void loop_calibration();
 
 class TouchCalibration {
@@ -35,6 +35,8 @@ protected:
   uint8_t calibration_state;
   void exit_calibration();
 public:
+  int16_t results[4];
+  TouchCalibration();
   void init_calibration(const uint8_t init_state);
 };
 

@@ -1,7 +1,8 @@
-#include <Arduino.h>
-#include <HardwareSerial.h>
-
 #include "xpt2046.h"
+
+#if ENABLED(TOUCHSCREEN)
+  #include "../../lcd/menu/touch/calibration.h"
+#endif
 
 static uint32_t timeout = 0;
 
@@ -29,11 +30,19 @@ uint8_t xpt2046_read_buttons()
 
   timeout = millis() + 250;
 
+  if (calibration.results[0] + calibration.results[1] == 0) {
+    // Not yet set, so use defines as fallback...
+    calibration.results[0] = XPT2046_X_CALIBRATION;
+    calibration.results[1] = XPT2046_X_OFFSET;
+    calibration.results[2] = XPT2046_Y_CALIBRATION;
+    calibration.results[3] = XPT2046_Y_OFFSET;
+  }
+
   // We rely on XPT2046 compatible mode to ADS7843, hence no Z1 and Z2 measurements possible.
 
   if (digitalRead(TOUCH_INT)) { return 0; } // if TOUCH_INT is high, no fingers are pressing on the touch screen > exit
-  x = (uint16_t)((((uint32_t)(getInTouch(XPT2046_X))) * XPT2046_X_CALIBRATION) >> 16) + XPT2046_X_OFFSET;
-  y = (uint16_t)((((uint32_t)(getInTouch(XPT2046_Y))) * XPT2046_Y_CALIBRATION) >> 16) + XPT2046_Y_OFFSET;
+  x = (uint16_t)((((uint32_t)(getInTouch(XPT2046_X))) * calibration.results[0]) >> 16) + calibration.results[1];
+  y = (uint16_t)((((uint32_t)(getInTouch(XPT2046_Y))) * calibration.results[2]) >> 16) + calibration.results[3];
   if (digitalRead(TOUCH_INT)) { return 0; } // The fingers still need to be on the TS to have a valid read.
 
   if (y < 185 || y > 224) { return 0; }

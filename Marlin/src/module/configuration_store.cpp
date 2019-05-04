@@ -68,6 +68,10 @@
   #include "../lcd/extensible_ui/ui_api.h"
 #endif
 
+#if ENABLED(TOUCHSCREEN)
+  #include "../lcd/menu/touch/calibration.h"
+#endif
+
 #if HAS_SERVOS
   #include "servo.h"
 #endif
@@ -290,6 +294,9 @@ typedef struct SettingsDataStruct {
   // ADVANCED_PAUSE_FEATURE
   //
   fil_change_settings_t fc_settings[EXTRUDERS];         // M603 T U L
+
+  // TOUCHSCREEN (STM32/XPT2046)
+  int16_t touchscreen_calibration[4];
 
   //
   // Tool-change settings
@@ -1109,6 +1116,17 @@ void MarlinSettings::postprocess() {
       EEPROM_WRITE(fc_settings);
     }
 
+    // TOUCHSCREEN
+    {
+      _FIELD_TEST(touchscreen_calibration);
+      #if ENABLED(TOUCHSCREEN)
+        EEPROM_WRITE(calibration.results);
+      #else
+        const int16_t touchscreen_calibration[4] = { 0, 0, 0, 0 };
+        EEPROM_WRITE(touchscreen_calibration);
+      #endif
+    }
+
     //
     // Multiple Extruders
     //
@@ -1841,6 +1859,16 @@ void MarlinSettings::postprocess() {
         #endif
         _FIELD_TEST(fc_settings);
         EEPROM_READ(fc_settings);
+      }
+
+      // TOUCHSCREEN (STM32/XPT2046)
+      {
+        int16_t touchscreen_calibration[4];
+        _FIELD_TEST(touchscreen_calibration);
+        EEPROM_READ(touchscreen_calibration);
+        #if ENABLED(TOUCHSCREEN)
+          memcpy(calibration.results, touchscreen_calibration, sizeof(touchscreen_calibration));
+        #endif
       }
 
       //

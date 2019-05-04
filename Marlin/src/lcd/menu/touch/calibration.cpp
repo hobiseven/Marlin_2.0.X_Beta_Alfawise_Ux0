@@ -27,11 +27,16 @@
 #include "../../ultralcd.h"
 #include "calibration.h"
 
+TouchCalibration::TouchCalibration()
+{
+  memset(&results[0], 0, sizeof(results));
+}
+
 void TouchCalibration::init_calibration(const uint8_t init_state) {
   calibration_state = init_state;
   ui.encoder_direction_normal();
   ui.defer_status_screen();
-  do_calibration();
+  do_calibration(results);
   exit_calibration();
 }
 

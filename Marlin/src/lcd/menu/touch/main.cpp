@@ -34,14 +34,14 @@ static void drawCross(uint16_t x, uint16_t y, uint16_t color) {
   lcdSetWindow(x, y - 15, x, y + 15); lcdFill(color, 31);
 }
 
-void do_calibration() {
+int16_t do_calibration(int16_t results[4]) {
   volatile uint32_t data;
   uint32_t i, j;
-
-  uint16_t x[4] = {0,0,0,0}, y[4] = {0,0,0,0};
   uint16_t length;
-
   uint16_t paul=0;
+
+  uint16_t x[4] = {0,0,0,0};
+  uint16_t y[4] = {0,0,0,0};
 
   pinMode(LED_PIN, OUTPUT); // initialize LED digital pin as an output on Longer3D LK1/LK2 boards
   digitalWrite(LED_PIN, HIGH);
@@ -119,7 +119,7 @@ void do_calibration() {
   }
 
   Serial1.flush();
-  if (lcdId == 0x0404) return;
+  if (lcdId == 0x0404) return -1;
 
   lcdInit();
 
@@ -288,6 +288,13 @@ void do_calibration() {
   while (!isTouched()) {};
 
   backlightTimeout = millis() + 60000;
+
+  results[0] = xCalibration;
+  results[1] = xOffset;
+  results[2] = yCalibration;
+  results[3] = yOffset;
+
+  return 0; // EOK
 }
 
 void loop_calibration() {
