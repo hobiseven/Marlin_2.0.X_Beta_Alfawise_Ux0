@@ -766,7 +766,12 @@ void MarlinUI::update() {
     #endif
   ) {
 
-    next_lcd_update_ms = ms + LCD_UPDATE_INTERVAL;
+  #if ENABLED(TOUCH_BUTTONS)
+    if (ui.on_status_screen())
+      next_lcd_update_ms = ms + LCD_UPDATE_INTERVAL*3;
+    else
+  #endif
+      next_lcd_update_ms = ms + LCD_UPDATE_INTERVAL;
 
     #if ENABLED(LCD_HAS_STATUS_INDICATORS)
       update_indicators();
