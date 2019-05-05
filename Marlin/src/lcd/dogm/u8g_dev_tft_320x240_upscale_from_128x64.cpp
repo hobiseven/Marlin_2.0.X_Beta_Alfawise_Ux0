@@ -59,6 +59,8 @@
 
 #if HAS_GRAPHICAL_LCD
 
+#define LCD_USE_DMA_FSMC
+
 #include "U8glib.h"
 #include "HAL_LCD_com_defines.h"
 #include <string.h>
@@ -417,12 +419,19 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
           const uint16_t c = TEST(b, y) ? TFT_MARLINUI_COLOR : TFT_MARLINBG_COLOR;
           buffer[k++] = c; buffer[k++] = c;
         }
+#ifdef LCD_USE_DMA_FSMC
+        for (k = 0; k < 2; k++) {
+          extern void LCD_IO_WriteSequence(uint16_t *data, uint16_t length);
+          LCD_IO_WriteSequence(buffer, 256);
+        }
+#else
         for (k = 0; k < 2; k++) {
           u8g_WriteSequence(u8g, dev, 128, (uint8_t*)buffer);
           u8g_WriteSequence(u8g, dev, 128, (uint8_t*)&(buffer[64]));
           u8g_WriteSequence(u8g, dev, 128, (uint8_t*)&(buffer[128]));
           u8g_WriteSequence(u8g, dev, 128, (uint8_t*)&(buffer[192]));
         }
+#endif
       }
       break;
 
