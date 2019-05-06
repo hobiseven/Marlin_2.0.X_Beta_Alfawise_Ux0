@@ -358,7 +358,7 @@ inline void memset2(const void *ptr, uint16_t fill, size_t cnt) {
 static bool sd, usb;
 #endif
 
-static bool preinit=true;
+static bool preinit = true;
 
 uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, uint8_t msg, void *arg) {
   u8g_pb_t *pb = (u8g_pb_t *)(dev->dev_mem);
@@ -409,7 +409,8 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
 
       u8g_WriteEscSeqP(u8g, dev, button2_sequence);
       drawImage(button2, u8g, dev, 40, 20, TFT_BTRIGHT_COLOR);
-      break;
+
+      return 0;
 
     case U8G_DEV_MSG_STOP:
       preinit = true;
@@ -418,15 +419,14 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
     case U8G_DEV_MSG_PAGE_FIRST:
 #ifdef DYNAMIC_DEV_ICONS
       // top icons
-      sd = card.isDetected();
-      usb = usb_serial_connected;
-      //if (ui.on_status_screen()) {
+      if (sd != card.isDetected() || usb != usb_serial_connected || !ui.on_status_screen()) {
+        sd = card.isDetected();
+        usb = usb_serial_connected;
         u8g_WriteEscSeqP(u8g, dev, sd_sequence);
         drawImage(sd_logo, u8g, dev, 16, 8, sd ? TFT_TOPICONS_COLOR : TFT_DISABLED_COLOR);
-
         u8g_WriteEscSeqP(u8g, dev, usb_sequence);
         drawImage(usb_logo, u8g, dev, 24, 8, usb ? TFT_TOPICONS_COLOR : TFT_DISABLED_COLOR);
-      //}
+      }
 #endif
       u8g_WriteEscSeqP(u8g, dev, page_first_sequence);
       break;
