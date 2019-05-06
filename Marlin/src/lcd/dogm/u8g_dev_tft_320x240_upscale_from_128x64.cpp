@@ -316,7 +316,7 @@ static const uint8_t button2[] = {
    B01111111,B11111111,B11111111,B11111111,B11111110,
 };
 
-void drawImage(const uint8_t *data, u8g_t *u8g, u8g_dev_t *dev,uint16_t length, uint16_t height, uint16_t color) {
+void drawImage(const uint8_t *data, u8g_t *u8g, u8g_dev_t *dev, uint16_t length, uint16_t height, uint16_t color) {
   uint16_t i, j, k;
   uint16_t buffer[160];
 
@@ -332,11 +332,16 @@ void drawImage(const uint8_t *data, u8g_t *u8g, u8g_dev_t *dev,uint16_t length, 
       }
     }
   #ifdef LCD_USE_DMA_FSMC
-    LCD_IO_WriteSequence(buffer, length << 1);
-    LCD_IO_WriteSequence(buffer, length << 1);
+    if (k <= 80) { // generally is... for our buttons
+      memcpy(&buffer[k], &buffer[0], sizeof(uint16_t)*k);
+      LCD_IO_WriteSequence(buffer, sizeof(uint16_t)*k);
+    } else {
+      LCD_IO_WriteSequence(buffer, k);
+      LCD_IO_WriteSequence(buffer, k);
+    }
   #else
-    u8g_WriteSequence(u8g, dev, length << 2, (uint8_t *)buffer);
-    u8g_WriteSequence(u8g, dev, length << 2, (uint8_t *)buffer);
+    u8g_WriteSequence(u8g, dev, k << 1, (uint8_t *)buffer);
+    u8g_WriteSequence(u8g, dev, k << 1, (uint8_t *)buffer);
   #endif
   }
 }
