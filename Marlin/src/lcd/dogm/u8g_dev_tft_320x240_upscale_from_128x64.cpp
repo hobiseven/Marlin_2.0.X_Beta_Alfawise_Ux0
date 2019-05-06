@@ -65,6 +65,11 @@
 #include "HAL_LCD_com_defines.h"
 #include <string.h>
 
+#ifdef LCD_USE_DMA_FSMC
+extern void LCD_IO_WriteSequence(uint16_t *data, uint16_t length);
+extern void LCD_IO_WriteMultiple(uint16_t data, uint32_t count);
+#endif
+
 #define WIDTH 128
 #define HEIGHT 64
 #define PAGE_HEIGHT 8
@@ -348,6 +353,8 @@ inline void memset2(const void *ptr, uint16_t fill, size_t cnt) {
 static bool sd, usb;
 #endif
 
+static bool preinit=true;
+
 uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, uint8_t msg, void *arg) {
   u8g_pb_t *pb = (u8g_pb_t *)(dev->dev_mem);
   uint16_t buffer[256]; //16 bit RGB 565 pixel line buffer
@@ -358,16 +365,25 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
       if (lcd_id == 0x040404) return 0; // No connected display on FSMC
       if (lcd_id == 0xFFFFFF) return 0; // No connected display on SPI
 
-      memset2(buffer, TFT_MARLINBG_COLOR, sizeof(buffer));
-
       if ((lcd_id & 0xFFFF) == 0x8552)  // ST7789V
         u8g_WriteEscSeqP(u8g, dev, st7789v_init_sequence);
       if ((lcd_id & 0xFFFF) == 0x9341)  // ILI9341
         u8g_WriteEscSeqP(u8g, dev, ili9341_init_sequence);
 
       u8g_WriteEscSeqP(u8g, dev, clear_screen_sequence);
+      #ifdef LCD_USE_DMA_FSMC
+      if (preinit) { // dma may not be ready on start
+        memset2(buffer, TFT_MARLINBG_COLOR, sizeof(buffer));
+        for (i = 0; i < 960; i++)
+          u8g_WriteSequence(u8g, dev, 160, (uint8_t *)buffer);
+      } else {
+        LCD_IO_WriteMultiple(TFT_MARLINBG_COLOR, (320*240));
+      }
+      #else
+      memset2(buffer, TFT_MARLINBG_COLOR, sizeof(buffer));
       for (i = 0; i < 960; i++)
         u8g_WriteSequence(u8g, dev, 160, (uint8_t *)buffer);
+      #endif
 
       // bottom line and buttons
 
@@ -390,9 +406,11 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
       u8g_WriteEscSeqP(u8g, dev, button2_sequence);
       drawImage(button2, u8g, dev, 40, 20, TFT_BTRIGHT_COLOR);
 
+      preinit = false;
       break;
 
     case U8G_DEV_MSG_STOP:
+      preinit = true;
       break;
 
     case U8G_DEV_MSG_PAGE_FIRST:
@@ -419,24 +437,24 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
           const uint16_t c = TEST(b, y) ? TFT_MARLINUI_COLOR : TFT_MARLINBG_COLOR;
           buffer[k++] = c; buffer[k++] = c;
         }
-#ifdef LCD_USE_DMA_FSMC
         for (k = 0; k < 2; k++) {
-          extern void LCD_IO_WriteSequence(uint16_t *data, uint16_t length);
+        #ifdef LCD_USE_DMA_FSMC
           LCD_IO_WriteSequence(buffer, 256);
-        }
-#else
-        for (k = 0; k < 2; k++) {
+        #else
           u8g_WriteSequence(u8g, dev, 128, (uint8_t*)buffer);
           u8g_WriteSequence(u8g, dev, 128, (uint8_t*)&(buffer[64]));
           u8g_WriteSequence(u8g, dev, 128, (uint8_t*)&(buffer[128]));
           u8g_WriteSequence(u8g, dev, 128, (uint8_t*)&(buffer[192]));
+        #endif
         }
-#endif
       }
       break;
 
     case U8G_DEV_MSG_SLEEP_ON:
+      // Enter Sleep Mode (10h)
+      return 1;
     case U8G_DEV_MSG_SLEEP_OFF:
+      // Sleep Out (11h)
       return 1;
   }
   return u8g_dev_pb8v1_base_fn(u8g, dev, msg, arg);
