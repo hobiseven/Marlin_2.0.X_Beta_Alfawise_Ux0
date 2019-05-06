@@ -374,6 +374,7 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
   static uint16_t bufferA[512];
   static uint16_t bufferB[512];
   uint16_t* buffer = &bufferA[0];
+  bool allow_async = false;
   #else
   uint16_t buffer[256]; //16 bit RGB 565 pixel line buffer
   #endif
@@ -468,11 +469,15 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
         }
         #ifdef LCD_USE_DMA_FSMC
         memcpy(&buffer[256], &buffer[0], 512);
-        if (y > 0 || page > 1) LCD_IO_WaitSequence_Async();
-        if (y == 7 && page == 8)
-          LCD_IO_WriteSequence(buffer, 512); // last line of last page
-        else
-          LCD_IO_WriteSequence_Async(buffer, 512);
+        if (allow_async) {
+          if (y > 0 || page > 1) LCD_IO_WaitSequence_Async();
+          if (y == 7 && page == 8)
+            LCD_IO_WriteSequence(buffer, 512); // last line of last page
+          else
+            LCD_IO_WriteSequence_Async(buffer, 512);
+        } else {
+          LCD_IO_WriteSequence(buffer, 512);
+        }
         #else
         for (k = 0; k < 2; k++) {
           u8g_WriteSequence(u8g, dev, 128, (uint8_t*)buffer);
