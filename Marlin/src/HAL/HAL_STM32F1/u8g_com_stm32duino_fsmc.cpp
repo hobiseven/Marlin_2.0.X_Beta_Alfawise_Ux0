@@ -38,15 +38,16 @@
 #include "libmaple/dma.h"
 #include "boards.h"
 
+#if 0 // todo later
 struct LCD_IO {
   uint32_t id;
   void (*writeRegister)(uint16_t Reg);
   uint32_t (*readData)(uint16_t RegValue, uint8_t ReadSize);
   void (*writeData)(uint16_t RegValue);
-  void (*writeMultiple)(uint16_t data, uint32_t count);
+  void (*writeMultiple)(uint16_t color, uint32_t count);
   void (*writeSequence)(uint16_t *data, uint16_t length);
-  void (*setWindow)(uint16_t Xmin, uint16_t Ymin, uint16_t Xmax, uint16_t Ymax);
 };
+#endif
 
 /* Timing configuration */
 #define FSMC_ADDRESS_SETUP_TIME   15  // AddressSetupTime
@@ -90,8 +91,7 @@ uint8_t u8g_com_stm32duino_fsmc_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, voi
 
       //LCD_IO_Init(FSMC_CS_NE1, FSMC_RS_A16);
       LCD_IO_Init(u8g->pin_list[U8G_PI_CS], u8g->pin_list[U8G_PI_A0]);
-
-      u8g_Delay(100);
+      u8g_Delay(50);
 
       if (arg_ptr != NULL) {
         *((uint32_t *)arg_ptr) = LCD_IO_ReadData(LCD_READ_ID, 3);
@@ -303,9 +303,9 @@ uint32_t LCD_IO_ReadData(uint16_t RegValue, uint8_t ReadSize) {
   return (uint32_t)data;
 }
 
-void LCD_IO_WriteMultiple(uint16_t data, uint32_t count) {
+void LCD_IO_WriteMultiple(uint16_t color, uint32_t count) {
   while (count > 0) {
-    dma_setup_transfer(FSMC_DMA_DEV, FSMC_DMA_CHANNEL, &data, DMA_SIZE_16BITS, &LCD->RAM, DMA_SIZE_16BITS, DMA_MEM_2_MEM);
+    dma_setup_transfer(FSMC_DMA_DEV, FSMC_DMA_CHANNEL, &color, DMA_SIZE_16BITS, &LCD->RAM, DMA_SIZE_16BITS, DMA_MEM_2_MEM);
     dma_set_num_transfers(FSMC_DMA_DEV, FSMC_DMA_CHANNEL, count > 65535 ? 65535 : count);
     dma_clear_isr_bits(FSMC_DMA_DEV, FSMC_DMA_CHANNEL);
     dma_enable(FSMC_DMA_DEV, FSMC_DMA_CHANNEL);
@@ -323,6 +323,18 @@ void LCD_IO_WriteSequence(uint16_t *data, uint16_t length) {
   dma_clear_isr_bits(FSMC_DMA_DEV, FSMC_DMA_CHANNEL);
   dma_enable(FSMC_DMA_DEV, FSMC_DMA_CHANNEL);
 
+  while ((dma_get_isr_bits(FSMC_DMA_DEV, FSMC_DMA_CHANNEL) & 0x0A) == 0) {};
+  dma_disable(FSMC_DMA_DEV, FSMC_DMA_CHANNEL);
+}
+
+void LCD_IO_WriteSequence_Async(uint16_t *data, uint16_t length) {
+  dma_setup_transfer(FSMC_DMA_DEV, FSMC_DMA_CHANNEL, data, DMA_SIZE_16BITS, &LCD->RAM, DMA_SIZE_16BITS, DMA_MEM_2_MEM | DMA_PINC_MODE);
+  dma_set_num_transfers(FSMC_DMA_DEV, FSMC_DMA_CHANNEL, length);
+  dma_clear_isr_bits(FSMC_DMA_DEV, FSMC_DMA_CHANNEL);
+  dma_enable(FSMC_DMA_DEV, FSMC_DMA_CHANNEL);
+}
+
+void LCD_IO_WaitSequence_Async() {
   while ((dma_get_isr_bits(FSMC_DMA_DEV, FSMC_DMA_CHANNEL) & 0x0A) == 0) {};
   dma_disable(FSMC_DMA_DEV, FSMC_DMA_CHANNEL);
 }

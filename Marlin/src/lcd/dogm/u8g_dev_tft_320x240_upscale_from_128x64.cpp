@@ -67,7 +67,7 @@
 
 #ifdef LCD_USE_DMA_FSMC
 extern void LCD_IO_WriteSequence(uint16_t *data, uint16_t length);
-extern void LCD_IO_WriteMultiple(uint16_t data, uint32_t count);
+extern void LCD_IO_WriteMultiple(uint16_t color, uint32_t count);
 #endif
 
 #define WIDTH 128
@@ -327,8 +327,8 @@ void drawImage(const uint8_t *data, u8g_t *u8g, u8g_dev_t *dev,uint16_t length, 
         buffer[k++] = color;
         buffer[k++] = color;
       } else {
-        buffer[k++] = 0x0000;
-        buffer[k++] = 0x0000;
+        buffer[k++] = TFT_MARLINBG_COLOR;
+        buffer[k++] = TFT_MARLINBG_COLOR;
       }
     }
   #ifdef LCD_USE_DMA_FSMC
@@ -392,14 +392,21 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
       // bottom line and buttons
 
       for (i = 0; i < 150; i++) buffer[i] = TFT_DISABLED_COLOR;
-      u8g_WriteEscSeqP(u8g, dev, separation_line_sequence_left);
-      for (i = 0; i < 4; i++)
-        u8g_WriteSequence(u8g, dev, 150, (uint8_t *)buffer);
-
-      for (i = 0; i < 150; i++) buffer[i] = TFT_DISABLED_COLOR;
-      u8g_WriteEscSeqP(u8g, dev, separation_line_sequence_right);
-      for (i = 0; i < 4; i++)
-        u8g_WriteSequence(u8g, dev, 150, (uint8_t *)buffer);
+      #ifdef LCD_USE_DMA_FSMC
+        u8g_WriteEscSeqP(u8g, dev, separation_line_sequence_left);
+        LCD_IO_WriteSequence(buffer, 150);
+        LCD_IO_WriteSequence(buffer, 150);
+        u8g_WriteEscSeqP(u8g, dev, separation_line_sequence_right);
+        LCD_IO_WriteSequence(buffer, 150);
+        LCD_IO_WriteSequence(buffer, 150);
+      #else
+        u8g_WriteEscSeqP(u8g, dev, separation_line_sequence_left);
+        for (i = 0; i < 4; i++)
+          u8g_WriteSequence(u8g, dev, 150, (uint8_t *)buffer);
+        u8g_WriteEscSeqP(u8g, dev, separation_line_sequence_right);
+        for (i = 0; i < 4; i++)
+          u8g_WriteSequence(u8g, dev, 150, (uint8_t *)buffer);
+      #endif
 
       u8g_WriteEscSeqP(u8g, dev, button0_sequence);
       drawImage(button0, u8g, dev, 40, 20, TFT_BTSLEFT_COLOR);
