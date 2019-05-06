@@ -55,7 +55,7 @@ struct LCD_IO {
 
 #define LCD_USE_DMA_FSMC
 #define FSMC_DMA_DEV        DMA2
-#define FSMC_DMA_CHANNEL    DMA_CH4
+#define FSMC_DMA_CHANNEL    DMA_CH5
 
 #define FSMC_CS_NE1         PD7
 #define FSMC_RS_A16         PD11

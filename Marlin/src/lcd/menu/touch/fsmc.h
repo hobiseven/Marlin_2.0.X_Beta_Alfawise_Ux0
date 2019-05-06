@@ -16,7 +16,7 @@
 #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
 
 #define FSMC_DMA_DEV        DMA2
-#define FSMC_DMA_CHANNEL    DMA_CH4
+#define FSMC_DMA_CHANNEL    DMA_CH5
 
 static inline uint32_t dma_get_count32(dma_dev *dev, dma_tube tube) { return dma_channel_regs(dev, tube)->CNDTR; }
 static inline void dma_set_num_transfers32(dma_dev *dev, dma_channel channel, uint32_t num_transfers) { dma_channel_regs(dev, channel)->CNDTR = num_transfers; }

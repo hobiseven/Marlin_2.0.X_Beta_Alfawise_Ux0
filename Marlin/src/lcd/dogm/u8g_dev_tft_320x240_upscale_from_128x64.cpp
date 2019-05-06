@@ -374,7 +374,7 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
   static uint16_t bufferA[512];
   static uint16_t bufferB[512];
   uint16_t* buffer = &bufferA[0];
-  bool allow_async = false;
+  bool allow_async = true;
   #else
   uint16_t buffer[256]; //16 bit RGB 565 pixel line buffer
   #endif
