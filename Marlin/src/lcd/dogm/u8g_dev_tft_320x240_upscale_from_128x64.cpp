@@ -373,14 +373,14 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
       u8g_WriteEscSeqP(u8g, dev, clear_screen_sequence);
       #ifdef LCD_USE_DMA_FSMC
       if (preinit) { // dma may not be ready on start
-        memset2(buffer, TFT_MARLINBG_COLOR, sizeof(buffer));
-        for (i = 0; i < 960; i++)
-          u8g_WriteSequence(u8g, dev, 160, (uint8_t *)buffer);
+        memset2(buffer, TFT_MARLINBG_COLOR, 240);
+        for (i = 0; i < 640; i++)
+          u8g_WriteSequence(u8g, dev, 240, (uint8_t *)buffer);
       } else {
         LCD_IO_WriteMultiple(TFT_MARLINBG_COLOR, (320*240));
       }
       #else
-      memset2(buffer, TFT_MARLINBG_COLOR, sizeof(buffer));
+      memset2(buffer, TFT_MARLINBG_COLOR, 160);
       for (i = 0; i < 960; i++)
         u8g_WriteSequence(u8g, dev, 160, (uint8_t *)buffer);
       #endif
