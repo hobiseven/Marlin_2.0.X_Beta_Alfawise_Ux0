@@ -362,7 +362,7 @@ static bool preinit = true;
 
 uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, uint8_t msg, void *arg) {
   u8g_pb_t *pb = (u8g_pb_t *)(dev->dev_mem);
-  uint16_t buffer[256]; //16 bit RGB 565 pixel line buffer
+  uint16_t buffer[512]; //16 bit RGB 565 pixel line double buffer
   uint16_t i;
   switch (msg) {
     case U8G_DEV_MSG_INIT:
@@ -391,15 +391,13 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
 
       // bottom line and buttons
 
-      for (i = 0; i < 150; i++) buffer[i] = TFT_DISABLED_COLOR;
       #ifdef LCD_USE_DMA_FSMC
         u8g_WriteEscSeqP(u8g, dev, separation_line_sequence_left);
-        LCD_IO_WriteSequence(buffer, 150);
-        LCD_IO_WriteSequence(buffer, 150);
+        LCD_IO_WriteMultiple(TFT_DISABLED_COLOR, 300);
         u8g_WriteEscSeqP(u8g, dev, separation_line_sequence_right);
-        LCD_IO_WriteSequence(buffer, 150);
-        LCD_IO_WriteSequence(buffer, 150);
+        LCD_IO_WriteMultiple(TFT_DISABLED_COLOR, 300);
       #else
+        memset2(buffer, TFT_DISABLED_COLOR, 150);
         u8g_WriteEscSeqP(u8g, dev, separation_line_sequence_left);
         for (i = 0; i < 4; i++)
           u8g_WriteSequence(u8g, dev, 150, (uint8_t *)buffer);
@@ -446,16 +444,17 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
           const uint16_t c = TEST(b, y) ? TFT_MARLINUI_COLOR : TFT_MARLINBG_COLOR;
           buffer[k++] = c; buffer[k++] = c;
         }
-        for (k = 0; k < 2; k++) {
         #ifdef LCD_USE_DMA_FSMC
-          LCD_IO_WriteSequence(buffer, 256);
+        memcpy(&buffer[256], &buffer[0], 512);
+        LCD_IO_WriteSequence(buffer, 512);
         #else
+        for (k = 0; k < 2; k++) {
           u8g_WriteSequence(u8g, dev, 128, (uint8_t*)buffer);
           u8g_WriteSequence(u8g, dev, 128, (uint8_t*)&(buffer[64]));
           u8g_WriteSequence(u8g, dev, 128, (uint8_t*)&(buffer[128]));
           u8g_WriteSequence(u8g, dev, 128, (uint8_t*)&(buffer[192]));
-        #endif
         }
+        #endif
       }
       break;
 
