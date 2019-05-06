@@ -67,6 +67,8 @@
 
 #ifdef LCD_USE_DMA_FSMC
 extern void LCD_IO_WriteSequence(uint16_t *data, uint16_t length);
+extern void LCD_IO_WriteSequence_Async(uint16_t *data, uint16_t length);
+extern void LCD_IO_WaitSequence_Async();
 extern void LCD_IO_WriteMultiple(uint16_t color, uint32_t count);
 #endif
 
@@ -364,10 +366,17 @@ static bool sd, usb;
 #endif
 
 static bool preinit = true;
+static uint8_t page;
 
 uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, uint8_t msg, void *arg) {
   u8g_pb_t *pb = (u8g_pb_t *)(dev->dev_mem);
-  uint16_t buffer[512]; //16 bit RGB 565 pixel line double buffer
+  #ifdef LCD_USE_DMA_FSMC
+  static uint16_t bufferA[512];
+  static uint16_t bufferB[512];
+  uint16_t* buffer = &bufferA[0];
+  #else
+  uint16_t buffer[256]; //16 bit RGB 565 pixel line buffer
+  #endif
   uint16_t i;
   switch (msg) {
     case U8G_DEV_MSG_INIT:
@@ -427,6 +436,7 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
       break;
 
     case U8G_DEV_MSG_PAGE_FIRST:
+      page = 0;
 #ifdef DYNAMIC_DEV_ICONS
       // top icons
       if (sd != card.isDetected() || usb != usb_serial_connected || !ui.on_status_screen()) {
@@ -442,8 +452,15 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
       break;
 
     case U8G_DEV_MSG_PAGE_NEXT:
+      page++;
+      if (page > 8)
+        return 1;
+
       for (uint16_t y = 0; y < 8; y++) {
         uint32_t k = 0;
+        #ifdef LCD_USE_DMA_FSMC
+        buffer = (y & 1) ? bufferB : bufferA;
+        #endif
         for (i = 0; i < (uint32_t)pb->width; i++) {
           const uint8_t b = *(((uint8_t *)pb->buf) + i);
           const uint16_t c = TEST(b, y) ? TFT_MARLINUI_COLOR : TFT_MARLINBG_COLOR;
@@ -451,7 +468,11 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
         }
         #ifdef LCD_USE_DMA_FSMC
         memcpy(&buffer[256], &buffer[0], 512);
-        LCD_IO_WriteSequence(buffer, 512);
+        if (y > 0 || page > 1) LCD_IO_WaitSequence_Async();
+        if (y == 7 && page == 8)
+          LCD_IO_WriteSequence(buffer, 512); // last line of last page
+        else
+          LCD_IO_WriteSequence_Async(buffer, 512);
         #else
         for (k = 0; k < 2; k++) {
           u8g_WriteSequence(u8g, dev, 128, (uint8_t*)buffer);
