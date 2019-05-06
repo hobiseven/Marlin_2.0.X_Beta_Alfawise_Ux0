@@ -331,8 +331,13 @@ void drawImage(const uint8_t *data, u8g_t *u8g, u8g_dev_t *dev,uint16_t length, 
         buffer[k++] = 0x0000;
       }
     }
+  #ifdef LCD_USE_DMA_FSMC
+    LCD_IO_WriteSequence(buffer, length << 1);
+    LCD_IO_WriteSequence(buffer, length << 1);
+  #else
     u8g_WriteSequence(u8g, dev, length << 2, (uint8_t *)buffer);
     u8g_WriteSequence(u8g, dev, length << 2, (uint8_t *)buffer);
+  #endif
   }
 }
 
@@ -370,19 +375,18 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
       if ((lcd_id & 0xFFFF) == 0x9341)  // ILI9341
         u8g_WriteEscSeqP(u8g, dev, ili9341_init_sequence);
 
+      if (preinit) {
+        preinit = false;
+        return u8g_dev_pb8v1_base_fn(u8g, dev, msg, arg);
+      }
+
       u8g_WriteEscSeqP(u8g, dev, clear_screen_sequence);
       #ifdef LCD_USE_DMA_FSMC
-      if (preinit) { // dma may not be ready on start
-        memset2(buffer, TFT_MARLINBG_COLOR, 240);
-        for (i = 0; i < 640; i++)
-          u8g_WriteSequence(u8g, dev, 240, (uint8_t *)buffer);
-      } else {
         LCD_IO_WriteMultiple(TFT_MARLINBG_COLOR, (320*240));
-      }
       #else
-      memset2(buffer, TFT_MARLINBG_COLOR, 160);
-      for (i = 0; i < 960; i++)
-        u8g_WriteSequence(u8g, dev, 160, (uint8_t *)buffer);
+        memset2(buffer, TFT_MARLINBG_COLOR, 160);
+        for (i = 0; i < 960; i++)
+          u8g_WriteSequence(u8g, dev, 160, (uint8_t *)buffer);
       #endif
 
       // bottom line and buttons
@@ -405,8 +409,6 @@ uint8_t u8g_dev_tft_320x240_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
 
       u8g_WriteEscSeqP(u8g, dev, button2_sequence);
       drawImage(button2, u8g, dev, 40, 20, TFT_BTRIGHT_COLOR);
-
-      preinit = false;
       break;
 
     case U8G_DEV_MSG_STOP:
