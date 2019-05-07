@@ -59,13 +59,11 @@
 
 #if HAS_GRAPHICAL_LCD
 
-#define LCD_USE_DMA_FSMC
-
 #include "U8glib.h"
 #include "HAL_LCD_com_defines.h"
 #include <string.h>
 
-#ifdef LCD_USE_DMA_FSMC
+#if ENABLED(LCD_USE_DMA_FSMC)
 extern void LCD_IO_WriteSequence(uint16_t *data, uint16_t length);
 extern void LCD_IO_WriteSequence_Async(uint16_t *data, uint16_t length);
 extern void LCD_IO_WaitSequence_Async();

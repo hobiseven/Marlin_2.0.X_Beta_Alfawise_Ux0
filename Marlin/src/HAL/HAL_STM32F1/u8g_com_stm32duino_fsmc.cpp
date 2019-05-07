@@ -38,27 +38,9 @@
 #include "libmaple/dma.h"
 #include "boards.h"
 
-#if 0 // todo later
-struct LCD_IO {
-  uint32_t id;
-  void (*writeRegister)(uint16_t Reg);
-  uint32_t (*readData)(uint16_t RegValue, uint8_t ReadSize);
-  void (*writeData)(uint16_t RegValue);
-  void (*writeMultiple)(uint16_t color, uint32_t count);
-  void (*writeSequence)(uint16_t *data, uint16_t length);
-};
-#endif
-
 /* Timing configuration */
 #define FSMC_ADDRESS_SETUP_TIME   15  // AddressSetupTime
 #define FSMC_DATA_SETUP_TIME      15  // DataSetupTime
-
-#define LCD_USE_DMA_FSMC
-#define FSMC_DMA_DEV        DMA2
-#define FSMC_DMA_CHANNEL    DMA_CH5
-
-#define FSMC_CS_NE1         PD7
-#define FSMC_RS_A16         PD11
 
 void LCD_IO_Init(uint8_t cs, uint8_t rs);
 void LCD_IO_WriteData(uint16_t RegValue);
@@ -89,19 +71,12 @@ uint8_t u8g_com_stm32duino_fsmc_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, voi
       dma_set_priority(FSMC_DMA_DEV, FSMC_DMA_CHANNEL, DMA_PRIORITY_HIGH);
 #endif
 
-      //LCD_IO_Init(FSMC_CS_NE1, FSMC_RS_A16);
+      //LCD_IO_Init(FSMC_CS_PIN, FSMC_RS_PIN);
       LCD_IO_Init(u8g->pin_list[U8G_PI_CS], u8g->pin_list[U8G_PI_A0]);
       u8g_Delay(50);
 
       if (arg_ptr != NULL) {
         *((uint32_t *)arg_ptr) = LCD_IO_ReadData(LCD_READ_ID, 3);
-#if 0
-        ((LCD_IO *)arg_ptr)->writeRegister = LCD_IO_WriteReg;
-        ((LCD_IO *)arg_ptr)->readData = LCD_IO_ReadData;
-        ((LCD_IO *)arg_ptr)->writeData = LCD_IO_WriteData;
-        ((LCD_IO *)arg_ptr)->writeMultiple = LCD_IO_WriteMultiple;
-        ((LCD_IO *)arg_ptr)->writeSequence = LCD_IO_WriteSequence;
-#endif
       }
       isCommand = 0;
       break;
@@ -138,6 +113,8 @@ uint8_t u8g_com_stm32duino_fsmc_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, voi
 __attribute__((always_inline)) __STATIC_INLINE void __DSB(void) {
   __ASM volatile ("dsb 0xF":::"memory");
 }
+
+#define FSMC_CS_NE1   PD7
 
 #ifdef STM32_XL_DENSITY
   #define FSMC_CS_NE2 PG9
@@ -303,6 +280,7 @@ uint32_t LCD_IO_ReadData(uint16_t RegValue, uint8_t ReadSize) {
   return (uint32_t)data;
 }
 
+#if ENABLED(LCD_USE_DMA_FSMC)
 void LCD_IO_WriteMultiple(uint16_t color, uint32_t count) {
   while (count > 0) {
     dma_setup_transfer(FSMC_DMA_DEV, FSMC_DMA_CHANNEL, &color, DMA_SIZE_16BITS, &LCD->RAM, DMA_SIZE_16BITS, DMA_MEM_2_MEM);
@@ -338,6 +316,7 @@ void LCD_IO_WaitSequence_Async() {
   while ((dma_get_isr_bits(FSMC_DMA_DEV, FSMC_DMA_CHANNEL) & 0x0A) == 0) {};
   dma_disable(FSMC_DMA_DEV, FSMC_DMA_CHANNEL);
 }
+#endif // LCD_USE_DMA_FSMC
 
 #endif // HAS_GRAPHICAL_LCD
 #endif // ARDUINO_ARCH_STM32F1 && (STM32_HIGH_DENSITY || STM32_XL_DENSITY)

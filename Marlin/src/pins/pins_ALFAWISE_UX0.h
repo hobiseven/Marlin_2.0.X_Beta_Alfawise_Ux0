@@ -1,9 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2016 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
- *
- * Based on Sprinter and grbl.
- * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
+ * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,11 +18,11 @@
  */
 
 /**
- * ALFAWISE U30 (STM32F130VET6) board pin assignments
+ * ALFAWISE U30 (STM32F103VET6) board pin assignments
  */
 
-#ifndef __STM32F1__
-  #error "Oops! Select an STM32F1 board in 'Tools > Board.'"
+#if !defined(__STM32F1__) && !defined(STM32F1xx)
+  #error "Oops! Select a STM32F1 board in 'Tools > Board.'"
 #endif
 
 #if HOTENDS > 1 || E_STEPPERS > 1
@@ -42,67 +39,60 @@
 //
 // Limit Switches
 //
-#define X_MIN_PIN         PC1
-//#define X_MAX_PIN         PC0  // Used as filament sensor runout on Alfawise setup
-#define Y_MIN_PIN         PC15
-//#define Y_MAX_PIN         PC14 // Unused in stock Alfawise steup. May also be used for Z_Probe Servo function
-#define Z_MIN_PIN         PE6  // Standard Endstop or Z_Probe endstop function
-//#define Z_MAX_PIN         PE5  // Unused in stock Alfawise steup.
-// or GCODE STOP COMMAND. / May also be used for Z_Probe Servo function
-
-//Servo for Z_Probe
-// #define SERVO0_PIN PE5 / Z_MAX / If you don't care about optional GCODE STOP COMMAND or
-//already used Y_Max Endstop.
-// #define SERVO0_PIN PC14 / Y_MAX / If you want to keep GCODE STOP COMMAND or/and Y_MAX not used.
-
+#define X_MIN_PIN         PC1  // pin 16
+//#define X_MAX_PIN       PC0  // pin 15 Used as filament sensor runout on Alfawise setup
+#define Y_MIN_PIN         PC15 // pin 9
+//#define Y_MAX_PIN       PC14 // pin 8 Unused in stock Alfawise steup. May also be used for Z_Probe Servo function
+#define Z_MIN_PIN         PE6  // pin 5 Standard Endstop or Z_Probe endstop function
+//#define Z_MAX_PIN       PE5  // pin 4 Unused in stock Alfawise steup.
+                               // May also be used for Z_Probe Servo function
 //
 // Steppers
 //
-#define X_ENABLE_PIN      PB5 // PB5 or 91
-#define X_STEP_PIN        PB4 // PB4 or 90
-#define X_DIR_PIN         PB3 // PB3 or 89
+#define X_ENABLE_PIN      PB5 // pin 91
+#define X_STEP_PIN        PB4 // pin 90
+#define X_DIR_PIN         PB3 // pin 89
 
-#define Y_ENABLE_PIN      PB8 // PB8 or 95
-#define Y_STEP_PIN        PB7 // PB7 or 93
-#define Y_DIR_PIN         PB6 // PB6 or 92
+#define Y_ENABLE_PIN      PB8 // pin 95
+#define Y_STEP_PIN        PB7 // pin 93
+#define Y_DIR_PIN         PB6 // pin 92
 
-#define Z_ENABLE_PIN      PE1 // PE1 or 98
-#define Z_STEP_PIN        PE0 // PE0 or 97
-#define Z_DIR_PIN         PB9 // PB9 or 96
+#define Z_ENABLE_PIN      PE1 // pin 98
+#define Z_STEP_PIN        PE0 // pin 97
+#define Z_DIR_PIN         PB9 // pin 96
 
-#define E0_ENABLE_PIN     PE4  // PE4 or 3
-#define E0_STEP_PIN       PE3  // PE3 or 2
-#define E0_DIR_PIN        PE2  // PE2 or 1
+#define E0_ENABLE_PIN     PE4 // pin 3
+#define E0_STEP_PIN       PE3 // pin 2
+#define E0_DIR_PIN        PE2 // pin 1
 
 //
 // Temperature Sensors
 //
-#define TEMP_0_PIN         PA0 // PA0 or 23  // Head thermistor 1
-#define TEMP_BED_PIN       PA1 //PA1 or 24   // Bed Thermistor 1
+#define TEMP_0_PIN        PA0 // pin 23 (Nozzle 100K/3950 thermistor)
+#define TEMP_BED_PIN      PA1 // pin 24 (Hot Bed 100K/3950 thermistor)
 
 //
 // Heaters / Fans
 //
-#define HEATER_0_PIN       PD3 // PD3 or 84   HEATER1
-#define HEATER_BED_PIN     PA8 //PA8 or 67   // HOT BED
+#define HEATER_0_PIN      PD3 // pin 84 (Nozzle Heat Mosfet)
+#define HEATER_BED_PIN    PA8 // pin 67 (Hot Bed Mosfet)
 
-#define FAN_PIN            PA15 // PA15 or 77   // FAN
-#define FAN_SOFT_PWM            // Required to avoid issues with heating or STLink
-#define FAN_MIN_PWM        35   // Fan will not start in 1-30 range
-#define FAN_MAX_PWM        255
+#define FAN_PIN          PA15 // pin 77 (4cm Fan)
+#define FAN_SOFT_PWM          // Required to avoid issues with heating or STLink
+#define FAN_MIN_PWM        35 // Fan will not start in 1-30 range
+#define FAN_MAX_PWM       255
 
-#define BTN_ENC            PB0 // PB0 or 35 unnconnected pin on Alfawise. Real pin is needed to enable encoder's push button functionality used by touch screen
-#define BTN_EN1            -1
-#define BTN_EN2            -1
+#define BTN_ENC           PB0 // pin 35 unnconnected pin on Alfawise. (PC13 to try)
+#define BTN_EN1            -1 // Real pin is needed to enable encoder's push button
+#define BTN_EN2            -1 // functionality used by touch screen
 
-//#define POWER_LOSS_PIN     PA2   // PW_DET (Serial 2)
-//#define PS_ON_PIN          PA3   // PW_OFF (Serial 2)
+// Filament Sensor
+#define FIL_RUNOUT_PIN    PC0 // XMAX plug on PCB used as filament runout sensor on Alfawise boards (inverting true)
 
-#define FIL_RUNOUT_PIN       PC0  // MT_DET >> X Max plug on PCB used as filament runout sensor on Alfawise boards
+//#define BEEPER_PIN     PD13 // pin 60 (Servo PWM output 5V/GND on Board V0G+) made for BL-Touch sensor
+                              // Can drive a PC Buzzer, if connected between PWM and 5V pins
 
-//#define BEEPER_PIN         PD13 // PD13 or 60 (Servo Pin 1 with NPN 5V output on Board V0G+)
-
-#define LED_PIN            PC2 // PC2 or 17
+#define LED_PIN           PC2 // pin 17
 
 /**
  * Note: Alfawise TFT screens may have 6 different TFT controllers
@@ -113,22 +103,24 @@
  * Reset feature was designed to "revive the LCD if static electricity killed it."
  */
 
-#define LCD_RESET_PIN      PC4 // PC4 or 33
-#define LCD_BACKLIGHT_PIN  PD12 // PD12 or 59
-#define FSMC_CS_PIN        PD7 // PD7 = FSMC_NE1 or 88
-#define FSMC_RS_PIN        PD11 // A16 PD11 or 58 Register / data select. Only one address needed
+#define LCD_RESET_PIN      PC4 // pin 33
+#define LCD_BACKLIGHT_PIN PD12 // pin 59
+#define FSMC_CS_PIN        PD7 // pin 88 = FSMC_NE1
+#define FSMC_RS_PIN       PD11 // pin 58 A16 Register. Only one address needed
 
+#define LCD_USE_DMA_FSMC  // Use DMA transferts to send data to the TFT
+#define FSMC_DMA_DEV      DMA2
+#define FSMC_DMA_CHANNEL  DMA_CH5
 
 /*
  * Note: Alfawise U20/U30 boards are NOT using SPI2 interface, as the hardware designer mixed up MOSI and MISO pins. SPI is managed in SW, and needs below pins declaration
  */
 
-#define TOUCH_CS           PB12 // PB12 or 51 SPI2_NSS
-#define TOUCH_SCK          PB13
-#define TOUCH_MOSI         PB14
-#define TOUCH_MISO         PB15
-
-#define TOUCH_INT          PC6 // PenIRQ coming from ADS7843
+#define TOUCH_CS          PB12 // pin 51 SPI2_NSS
+#define TOUCH_SCK         PB13 // pin 52
+#define TOUCH_MOSI        PB14 // pin 53
+#define TOUCH_MISO        PB15 // pin 54
+#define TOUCH_INT          PC6 // pin 63 (PenIRQ coming from ADS7843)
 
 /*
 //
@@ -140,12 +132,12 @@
 
 //#define SPI_EEPROM          // If commented this will create a file on the SD card as a replacement
 #define SPI_CHAN_EEPROM1   1
-#define SPI_EEPROM1_CS     PC5
+#define SPI_EEPROM1_CS     PC5 // pin 34
 
-//#define EEPROM_SCK         BOARD_SPI1_SCK_PIN  // PA5
-//#define EEPROM_MISO        BOARD_SPI1_MISO_PIN // PA6
-//#define EEPROM_MOSI        BOARD_SPI1_MOSI_PIN // PA7
+//#define EEPROM_SCK         BOARD_SPI1_SCK_PIN  // PA5 pin 30
+//#define EEPROM_MISO        BOARD_SPI1_MISO_PIN // PA6 pin 31
+//#define EEPROM_MOSI        BOARD_SPI1_MOSI_PIN // PA7 pin 32
 
 #define SPI_CHAN_DAC       2
-#define DAC0_SYNC          PA4
+#define DAC0_SYNC          PA4 // pin 29 but seems not used, error in schematics ?
 */
