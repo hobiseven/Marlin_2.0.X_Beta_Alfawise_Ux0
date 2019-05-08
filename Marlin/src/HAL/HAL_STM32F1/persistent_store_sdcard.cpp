@@ -33,7 +33,11 @@
 
 #include "../shared/persistent_store_api.h"
 
-#define HAL_STM32F1_EEPROM_SIZE 4096
+#ifndef E2END
+  #define HAL_STM32F1_EEPROM_SIZE 4096
+#else
+  #define HAL_STM32F1_EEPROM_SIZE (E2END + 1)
+#endif
 static char HAL_STM32F1_eeprom_content[HAL_STM32F1_EEPROM_SIZE];
 
 #if DISABLED(SDSUPPORT)
