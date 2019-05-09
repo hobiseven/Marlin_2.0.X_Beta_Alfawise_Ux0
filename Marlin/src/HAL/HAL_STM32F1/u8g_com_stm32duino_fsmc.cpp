@@ -68,7 +68,7 @@ uint8_t u8g_com_stm32duino_fsmc_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, voi
 #ifdef LCD_USE_DMA_FSMC
       dma_init(FSMC_DMA_DEV);
       dma_disable(FSMC_DMA_DEV, FSMC_DMA_CHANNEL);
-      dma_set_priority(FSMC_DMA_DEV, FSMC_DMA_CHANNEL, DMA_PRIORITY_HIGH);
+      dma_set_priority(FSMC_DMA_DEV, FSMC_DMA_CHANNEL, DMA_PRIORITY_MEDIUM);
 #endif
 
       //LCD_IO_Init(FSMC_CS_PIN, FSMC_RS_PIN);
