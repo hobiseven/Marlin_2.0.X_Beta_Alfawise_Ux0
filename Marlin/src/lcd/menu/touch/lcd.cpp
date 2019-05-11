@@ -1,3 +1,7 @@
+#include "../../../inc/MarlinConfig.h"
+
+#if defined(__STM32F1__) && ENABLED(TOUCH_CALIBRATION)
+
 #include <Arduino.h>
 #include <stdint.h>
 
@@ -76,7 +80,7 @@ void lcdPrint(uint16_t x, uint16_t y, char *text)
 
 void lcdFill(uint16_t color, uint32_t count)
 {
-#if defined(ARDUINO_ARCH_STM32)
+#if ENABLED(LCD_USE_DMA_FSMC)
   while (count > 0) {
     dma_setup_transfer(FSMC_DMA_DEV, FSMC_DMA_CHANNEL, &color, DMA_SIZE_16BITS, &LCD->RAM, DMA_SIZE_16BITS, DMA_MEM_2_MEM);
     dma_set_num_transfers(FSMC_DMA_DEV, FSMC_DMA_CHANNEL, count > 65535 ? 65535 : count);
@@ -96,3 +100,5 @@ void lcdClear(uint16_t color)
   lcdSetWindow(0, 0, 319, 239);
   lcdFill(color, 76800);
 }
+
+#endif // TOUCH_CALIBRATION

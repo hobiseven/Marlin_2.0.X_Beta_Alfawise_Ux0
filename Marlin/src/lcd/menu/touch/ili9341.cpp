@@ -1,3 +1,7 @@
+#include "../../../inc/MarlinConfig.h"
+
+#if defined(__STM32F1__) && ENABLED(TOUCH_CALIBRATION)
+
 #include "ili9341.h"
 
 #include "fsmc.h"
@@ -107,3 +111,5 @@ void ILI9341_SetWindow(uint16_t Xmin, uint16_t Ymin, uint16_t Xmax, uint16_t Yma
 
   LCD_IO_WriteReg(ILI9341_WRITE_RAM);
 }
+
+#endif

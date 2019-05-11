@@ -1,10 +1,9 @@
-#include "../../../inc/MarlinConfigPre.h"
+#include "../../../inc/MarlinConfig.h"
 
-#include <Arduino.h>
-#include "lcd.h"
+#if defined(ARDUINO_ARCH_STM32F1) && ENABLED(TOUCH_CALIBRATION)
 
-#if defined(ARDUINO_ARCH_STM32)
 #include "xpt2046.h"
+#include "lcd.h"
 
 #ifndef HEATER_BED_PIN
 #define HEATER_BED_PIN PA8
@@ -13,7 +12,6 @@
 #define LED_PIN        PC2
 #endif
 
-//#define STM32_HIGH_DENSITY
 // Force init to be called *first*, i.e. before static object allocation.
 // Otherwise, statically allocated objects that need libmaple may fail.
 // __attribute__(( constructor (101))) void premain() {
@@ -38,13 +36,15 @@ int16_t do_calibration(int16_t results[4]) {
   volatile uint32_t data;
   uint32_t i, j;
   uint16_t length;
-  uint16_t paul=0;
 
   uint16_t x[4] = {0,0,0,0};
   uint16_t y[4] = {0,0,0,0};
 
   pinMode(LED_PIN, OUTPUT); // initialize LED digital pin as an output on Longer3D LK1/LK2 boards
   digitalWrite(LED_PIN, HIGH);
+
+  TOUCH_LCD_BacklightOff();
+  TOUCH_LCD_Reset();
 
   // Set all heaters inactive, as well as Alfawise fan
   pinMode(HEATER_BED_PIN, OUTPUT);
@@ -58,15 +58,17 @@ int16_t do_calibration(int16_t results[4]) {
   Serial1.println("\nSTM32F103VET6");
   Serial1.flush();
 
+#if ENABLED(LCD_USE_DMA_FSMC)
   dma_init(FSMC_DMA_DEV);
   dma_disable(FSMC_DMA_DEV, FSMC_DMA_CHANNEL);
   dma_set_priority(FSMC_DMA_DEV, FSMC_DMA_CHANNEL, DMA_PRIORITY_HIGH);
+#endif
 
   TOUCH_LCD_BacklightOn();
 
-  TOUCH_LCD_IO_Init();
-  TOUCH_LCD_Delay(100);
-  TOUCH_LCD_Reset();
+  //TOUCH_LCD_IO_Init();
+  //TOUCH_LCD_Delay(100);
+  //TOUCH_LCD_Reset();
 
   Serial1.print("DisplayID ID1 Reg : ");
   reg00 = TOUCH_LCD_IO_ReadReg(0x00);
@@ -330,10 +332,5 @@ void loop_calibration() {
   TOUCH_LCD_IO_WriteData(color);
 }
 
-#else /* other arch */
-void do_calibration() {}
-void loop_calibration() {}
+#endif // TOUCH_CALIBRATION
 
-uint16_t color = WHITE, bgColor = BLACK;
-uint16_t reg00, lcdId = 0;
-#endif

@@ -1,6 +1,12 @@
+#ifdef __STM32F1__
+
+#include "../../inc/MarlinConfig.h"
+
+#if ENABLED(TOUCH_BUTTONS)
+
 #include "xpt2046.h"
 
-#if ENABLED(TOUCHSCREEN)
+#if ENABLED(TOUCH_CALIBRATION)
   #include "../../lcd/menu/touch/calibration.h"
 #endif
 
@@ -24,25 +30,33 @@ void touch_swSPI_init(void)
 uint8_t xpt2046_read_buttons()
 {
   uint16_t x, y;
+  int16_t tsoffsets[4] = { 0, 0, 0, 0 };
 
   if (timeout > millis())
     return 0;
 
   timeout = millis() + 250;
 
-  if (calibration.results[0] + calibration.results[1] == 0) {
+  #if ENABLED(TOUCH_CALIBRATION)
+    tsoffsets[0] = calibration.results[0];
+    tsoffsets[1] = calibration.results[1];
+    tsoffsets[2] = calibration.results[2];
+    tsoffsets[3] = calibration.results[3];
+  #endif
+
+  if (tsoffsets[0] + tsoffsets[1] == 0) {
     // Not yet set, so use defines as fallback...
-    calibration.results[0] = XPT2046_X_CALIBRATION;
-    calibration.results[1] = XPT2046_X_OFFSET;
-    calibration.results[2] = XPT2046_Y_CALIBRATION;
-    calibration.results[3] = XPT2046_Y_OFFSET;
+    tsoffsets[0] = XPT2046_X_CALIBRATION;
+    tsoffsets[1] = XPT2046_X_OFFSET;
+    tsoffsets[2] = XPT2046_Y_CALIBRATION;
+    tsoffsets[3] = XPT2046_Y_OFFSET;
   }
 
   // We rely on XPT2046 compatible mode to ADS7843, hence no Z1 and Z2 measurements possible.
 
   if (digitalRead(TOUCH_INT)) { return 0; } // if TOUCH_INT is high, no fingers are pressing on the touch screen > exit
-  x = (uint16_t)((((uint32_t)(getInTouch(XPT2046_X))) * calibration.results[0]) >> 16) + calibration.results[1];
-  y = (uint16_t)((((uint32_t)(getInTouch(XPT2046_Y))) * calibration.results[2]) >> 16) + calibration.results[3];
+  x = (uint16_t)((((uint32_t)(getInTouch(XPT2046_X))) * tsoffsets[0]) >> 16) + tsoffsets[1];
+  y = (uint16_t)((((uint32_t)(getInTouch(XPT2046_Y))) * tsoffsets[2]) >> 16) + tsoffsets[3];
   if (digitalRead(TOUCH_INT)) { return 0; } // The fingers still need to be on the TS to have a valid read.
 
   if (y < 185 || y > 224) { return 0; }
@@ -94,3 +108,5 @@ uint16_t getInTouch(uint8_t coordinate)
   return (data[1] + data[2]) >> 1;
 }
 
+#endif // TOUCH_BUTTONS
+#endif // __STM32F1__

@@ -1,3 +1,7 @@
+#include "../../../inc/MarlinConfig.h"
+
+#if defined(__STM32F1__) && ENABLED(TOUCH_CALIBRATION)
+
 #include "st7789v.h"
 #include "fsmc.h"
 
@@ -132,3 +136,5 @@ void st7789v_SetWindow(uint16_t Xmin, uint16_t Ymin, uint16_t Xmax, uint16_t Yma
 
   LCD_IO_WriteReg(ST7789V_WRITE_RAM);
 }
+
+#endif

@@ -47,7 +47,7 @@
   #endif
 #endif
 
-#if ENABLED(TOUCH_BUTTONS)
+#if ENABLED(TOUCH_CALIBRATION)
   #include "touch/calibration.h"
 #endif
 
@@ -362,14 +362,8 @@ void menu_configuration() {
       MENU_ITEM(function, MSG_LOAD_EEPROM, lcd_load_settings);
   #endif
 
-  #if ENABLED(TOUCH_BUTTONS)
-    MENU_ITEM(submenu, MSG_TOUCHSCREEN, (
-      #if 1
-        menu_touchscreen
-      #else
-        enter_touch_calibrate
-      #endif
-    ));
+  #if ENABLED(TOUCH_CALIBRATION)
+    MENU_ITEM(submenu, MSG_TOUCHSCREEN, menu_touchscreen);
   #endif
 
   if (!busy)

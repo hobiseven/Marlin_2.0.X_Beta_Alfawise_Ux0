@@ -17,9 +17,9 @@
  *
  */
 
-#include "../../inc/MarlinConfigPre.h"
+#include "../../inc/MarlinConfig.h"
 
-#if ENABLED(TOUCH_BUTTONS)
+#if ENABLED(TOUCH_CALIBRATION)
 
 #include "menu.h"
 #include "touch/calibration.h"
@@ -31,16 +31,16 @@ void menu_touchscreen() {
   MENU_BACK(MSG_MAIN);
   MENU_ITEM(submenu, MSG_CALIBRATION, enter_touch_calibrate);
 #ifdef TS_V11
-  STATIC_ITEM("ILI9341 v1.1", false, false);
+  STATIC_ITEM("ILI9341 v1.1", false);
 #else
-  STATIC_ITEM("ILI9341 v1.2", false, false);
+  STATIC_ITEM("ILI9341 v1.2", false);
 #endif
   {
     char line[16];
     snprintf(line, 16, "X: %hd %hd", calibration.results[0], calibration.results[1]);
-    STATIC_ITEM(line, false, false);
+    STATIC_ITEM(line, false);
     snprintf(line, 16, "Y: %hd %hd", calibration.results[2], calibration.results[3]);
-    STATIC_ITEM(line, false, false);
+    STATIC_ITEM(line, false);
   }
   END_MENU();
 }
@@ -49,4 +49,4 @@ void enter_touch_calibrate() {
   calibration.init_calibration(1);
 }
 
-#endif // TOUCH_BUTTONS
+#endif // TOUCH_CALIBRATION

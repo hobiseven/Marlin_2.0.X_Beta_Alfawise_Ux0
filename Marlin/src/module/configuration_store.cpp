@@ -68,7 +68,7 @@
   #include "../lcd/extensible_ui/ui_api.h"
 #endif
 
-#if ENABLED(TOUCHSCREEN)
+#if ENABLED(TOUCH_CALIBRATION)
   #include "../lcd/menu/touch/calibration.h"
 #endif
 
@@ -295,7 +295,7 @@ typedef struct SettingsDataStruct {
   //
   fil_change_settings_t fc_settings[EXTRUDERS];         // M603 T U L
 
-  // TOUCHSCREEN (STM32/XPT2046)
+  // TOUCH_CALIBRATION (XPT2046)
   int16_t touchscreen_calibration[4];
 
   //
@@ -1116,10 +1116,10 @@ void MarlinSettings::postprocess() {
       EEPROM_WRITE(fc_settings);
     }
 
-    // TOUCHSCREEN
+    // TOUCH_CALIBRATION
     {
       _FIELD_TEST(touchscreen_calibration);
-      #if ENABLED(TOUCHSCREEN)
+      #if ENABLED(TOUCH_CALIBRATION)
         EEPROM_WRITE(calibration.results);
       #else
         const int16_t touchscreen_calibration[4] = { 0, 0, 0, 0 };
@@ -1861,12 +1861,12 @@ void MarlinSettings::postprocess() {
         EEPROM_READ(fc_settings);
       }
 
-      // TOUCHSCREEN (STM32/XPT2046)
+      // TOUCH_CALIBRATION (XPT2046)
       {
         int16_t touchscreen_calibration[4];
         _FIELD_TEST(touchscreen_calibration);
         EEPROM_READ(touchscreen_calibration);
-        #if ENABLED(TOUCHSCREEN)
+        #if ENABLED(TOUCH_CALIBRATION)
           memcpy(calibration.results, touchscreen_calibration, sizeof(touchscreen_calibration));
         #endif
       }

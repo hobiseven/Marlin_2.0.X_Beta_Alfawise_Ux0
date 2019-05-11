@@ -1,3 +1,7 @@
+#include "../../../inc/MarlinConfig.h"
+
+#if defined(__STM32F1__) && ENABLED(TOUCH_CALIBRATION)
+
 #include "ili9328.h"
 
 #include "fsmc.h"
@@ -128,3 +132,5 @@ void ili9328_SetWindow(uint16_t Xmin, uint16_t Ymin, uint16_t XMax, uint16_t Yma
 
   ili9328_SetCursor(Xmin, Ymin);
 }
+
+#endif

@@ -18,9 +18,9 @@
  */
 #pragma once
 
-#include "../../../inc/MarlinConfigPre.h"
+#include "../../../inc/MarlinConfig.h"
 
-#if ENABLED(TOUCH_BUTTONS)
+#if ENABLED(TOUCH_CALIBRATION)
 
 // menu_touchscreen.cpp
 void menu_touchscreen();
@@ -42,4 +42,4 @@ public:
 
 extern TouchCalibration calibration;
 
-#endif // TOUCH_BUTTONS
+#endif // TOUCH_CALIBRATION

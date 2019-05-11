@@ -20,9 +20,9 @@
  *
  */
 
-#include "../../../inc/MarlinConfigPre.h"
+#include "../../../inc/MarlinConfig.h"
 
-#if ENABLED(TOUCH_BUTTONS)
+#if ENABLED(TOUCH_CALIBRATION)
 
 #include "../../ultralcd.h"
 #include "calibration.h"
@@ -45,4 +45,4 @@ void TouchCalibration::exit_calibration() {
   ui.goto_previous_screen_no_defer();
 }
 
-#endif // TOUCH_BUTTONS
+#endif // TOUCH_CALIBRATION

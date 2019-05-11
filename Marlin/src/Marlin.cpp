@@ -57,7 +57,7 @@
 #include "gcode/parser.h"
 #include "gcode/queue.h"
 
-#if ENABLED(TOUCHSCREEN)
+#if ENABLED(TOUCH_BUTTONS)
   #include "xpt2046.h"
 #endif
 
@@ -1048,7 +1048,7 @@ void setup() {
     fanmux_init();
   #endif
 
-  #if ENABLED(TOUCHSCREEN)
+  #if ENABLED(TOUCH_BUTTONS)
     touch_swSPI_init();
   #endif
 

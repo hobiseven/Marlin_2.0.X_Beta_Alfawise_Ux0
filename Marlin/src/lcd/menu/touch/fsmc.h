@@ -1,9 +1,9 @@
-#include "../../../inc/MarlinConfigPre.h"
+#include "../../../inc/MarlinConfig.h"
 
 #include <Arduino.h>
 #include <stdint.h>
 
-#if defined(ARDUINO_ARCH_STM32)
+#if defined(ARDUINO_ARCH_STM32) && defined(ALFAWISE_UX0)
 
 #include <libmaple/fsmc.h>
 #include <libmaple/gpio.h>
@@ -58,7 +58,7 @@ __attribute__((always_inline)) __STATIC_INLINE void __DSB(void) {
   __ASM volatile ("dsb 0xF":::"memory");
 }
 
-void TOUCH_LCD_IO_Init(void);
+#define TOUCH_LCD_IO_Init() {}
 void TOUCH_LCD_IO_WriteData(uint16_t RegValue);
 void TOUCH_LCD_IO_WriteReg(uint16_t Reg);
 uint32_t TOUCH_LCD_IO_ReadData(uint16_t RegValue, uint8_t ReadSize);
@@ -77,7 +77,6 @@ void TOUCH_LCD_Reset(void);
 
 #else // ARDUINO_ARCH_STM32
 
-#define TOUCH_LCD_IO_Init()
 #define TOUCH_LCD_IO_WriteData(r)
 #define TOUCH_LCD_IO_WriteReg(r)
 #define TOUCH_LCD_IO_ReadData(r,s)
