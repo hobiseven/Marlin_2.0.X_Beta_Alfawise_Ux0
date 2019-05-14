@@ -135,7 +135,7 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
       break;
     case TEMP_TIMER_NUM:
       timer_pause(TEMP_TIMER_DEV);
-      timer_set_mode(STEP_TIMER_DEV, STEP_TIMER_CHAN, TIMER_OUTPUT_COMPARE); // counter
+      timer_set_mode(TEMP_TIMER_DEV, TEMP_TIMER_CHAN, TIMER_OUTPUT_COMPARE);
       timer_set_count(TEMP_TIMER_DEV, 0);
       timer_set_prescaler(TEMP_TIMER_DEV, (uint16_t)(TEMP_TIMER_PRESCALE - 1));
       timer_set_reload(TEMP_TIMER_DEV, 0xFFFF);
