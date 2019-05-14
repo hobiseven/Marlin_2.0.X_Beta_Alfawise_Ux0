@@ -1387,16 +1387,14 @@ void Stepper::isr() {
   // A modifier : if (!nextMainISR) Stepper::stepper_pulse_phase_isr();
   // il faudrait une variable statique  previous_nextMainISR = next_MainISR
   // et la ligne devient : if (!previous_nextMainISR) Stepper::stepper_pulse_phase_isr()
-  // mais la je coupe peut etre les cheveux en quatre. On parle d'un pas.... 0.01mm... LOL
+  // mais la je coupe peut etre les cheveux en quatre. On parle d'un pas.... 0.01mm...
 
   // Autre piste importante : La config de libmaple, et c'est peut etre ce qui nous a tue, 1 BIT!!
 
   //* NOTE: By default libmaple sets ARPE = 1, which means the Auto reload register is preloaded
   //(will only update with an update event)
-  // C'est peut etre le seul bug a corriger... 1 SEUL PUTAIN DE BIT! ARPE=0 est peut etre tout ce qu'il faut faire!!!!
-
-  //je l'ai pas trouve dans timer.h, c'est un peu la merde...
-  //Il est 1h du mat.. DODO!
+  // ARPE needs to be set to 0 to use HAL_timer_set_compare(STEP_TIMER_NUM, hal_timer_t(next_isr_ticks));
+  
 #endif
 
   // Don't forget to finally reenable interrupts
