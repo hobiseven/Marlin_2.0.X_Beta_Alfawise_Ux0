@@ -45,7 +45,7 @@
 typedef uint16_t hal_timer_t;
 #define HAL_TIMER_TYPE_MAX 0xFFFF
 
-#define HAL_TIMER_RATE         (F_CPU)  // frequency of timers peripherals
+#define HAL_TIMER_RATE uint32_t(F_CPU)  // frequency of timers peripherals
 
 #define STEP_TIMER_CHAN 1 // Channel of the timer to use for compare and interrupts
 #define TEMP_TIMER_CHAN 1 // Channel of the timer to use for compare and interrupts
@@ -57,6 +57,9 @@ typedef uint16_t hal_timer_t;
 #endif
 #define TEMP_TIMER_NUM 2  // index of timer to use for temperature
 #define PULSE_TIMER_NUM STEP_TIMER_NUM
+
+#define STEP_TIMER_IRQ_PRIO 1
+#define TEMP_TIMER_IRQ_PRIO 2
 
 #define TEMP_TIMER_PRESCALE     1000 // prescaler for setting Temp timer, 72Khz
 #define TEMP_TIMER_FREQUENCY    1000 // temperature interrupt frequency
@@ -132,8 +135,17 @@ FORCE_INLINE static void HAL_timer_set_compare(const uint8_t timer_num, const ha
   case TEMP_TIMER_NUM:
     timer_set_compare(TEMP_TIMER_DEV, TEMP_TIMER_CHAN, compare);
     return;
-  default:
-    return;
+  }
+}
+
+FORCE_INLINE static void HAL_timer_set_reload(const uint8_t timer_num, const hal_timer_t compare) {
+  switch (timer_num) {
+  case STEP_TIMER_NUM:
+    timer_set_reload(STEP_TIMER_DEV, compare);
+    break;
+  case TEMP_TIMER_NUM:
+    timer_set_reload(TEMP_TIMER_DEV, compare);
+    break;
   }
 }
 
@@ -157,8 +169,6 @@ FORCE_INLINE static void HAL_timer_isr_prologue(const uint8_t timer_num) {
   case TEMP_TIMER_NUM:
     timer_set_count(TEMP_TIMER_DEV, 0);
     timer_generate_update(TEMP_TIMER_DEV);
-    return;
-  default:
     return;
   }
 }

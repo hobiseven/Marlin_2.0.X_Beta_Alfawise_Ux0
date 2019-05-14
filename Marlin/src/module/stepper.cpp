@@ -1262,7 +1262,7 @@ void Stepper::isr() {
   // Program timer compare for the maximum period, so it does NOT
   // flag an interrupt while this ISR is running - So changes from small
   // periods to big periods are respected and the timer does not reset to 0
-  HAL_timer_set_compare(STEP_TIMER_NUM, HAL_TIMER_TYPE_MAX);
+  HAL_timer_set_compare(STEP_TIMER_NUM, hal_timer_t(HAL_TIMER_TYPE_MAX));
 
   // Count of ticks for the next ISR
   hal_timer_t next_isr_ticks = 0;
@@ -1373,8 +1373,31 @@ void Stepper::isr() {
   // Now 'next_isr_ticks' contains the period to the next Stepper ISR - And we are
   // sure that the time has not arrived yet - Warrantied by the scheduler
 
+#ifndef __STM32F1__
   // Set the next ISR to fire at the proper time
   HAL_timer_set_compare(STEP_TIMER_NUM, hal_timer_t(next_isr_ticks));
+
+#else
+  HAL_timer_set_reload(STEP_TIMER_NUM, hal_timer_t(next_isr_ticks));
+  // La valeur next_isr ticks ne sera pas appliquee sur l'isr actuelle, mais sur la suivante
+  // il faut decaler aussi les steps à effectuer vers la prochaine it, s
+  //    >>>> a decaler d'une ISR :
+
+  // Run main stepping pulse phase ISR if we have to
+  // A modifier : if (!nextMainISR) Stepper::stepper_pulse_phase_isr();
+  // il faudrait une variable statique  previous_nextMainISR = next_MainISR
+  // et la ligne devient : if (!previous_nextMainISR) Stepper::stepper_pulse_phase_isr()
+  // mais la je coupe peut etre les cheveux en quatre. On parle d'un pas.... 0.01mm... LOL
+
+  // Autre piste importante : La config de libmaple, et c'est peut etre ce qui nous a tue, 1 BIT!!
+
+  //* NOTE: By default libmaple sets ARPE = 1, which means the Auto reload register is preloaded
+  //(will only update with an update event)
+  // C'est peut etre le seul bug a corriger... 1 SEUL PUTAIN DE BIT! ARPE=0 est peut etre tout ce qu'il faut faire!!!!
+
+  //je l'ai pas trouve dans timer.h, c'est un peu la merde...
+  //Il est 1h du mat.. DODO!
+#endif
 
   // Don't forget to finally reenable interrupts
   ENABLE_ISRS();
