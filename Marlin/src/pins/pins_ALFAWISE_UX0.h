@@ -122,14 +122,14 @@
 #define TOUCH_MISO        PB15 // pin 54
 #define TOUCH_INT          PC6 // pin 63 (PenIRQ coming from ADS7843)
 
-/*
 //
 // SPI1 (EEPROM W25Q64 + DAC OUT)
 //
 
 #undef E2END
-#define E2END              0x1FFF // EEPROM end address (reserve 8kB, but real size is 8MB/64Mbits)
+#define E2END              0x7FF // EEPROM end address (reserve 2kB on sd/sram, real spi one is 8MB/64Mbits)
 
+/*
 //#define SPI_EEPROM          // If commented this will create a file on the SD card as a replacement
 #define SPI_CHAN_EEPROM1   1
 #define SPI_EEPROM1_CS     PC5 // pin 34
