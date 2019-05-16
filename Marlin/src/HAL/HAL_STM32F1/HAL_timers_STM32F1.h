@@ -127,24 +127,18 @@ bool HAL_timer_interrupt_enabled(const uint8_t timer_num);
  */
 
 FORCE_INLINE static void HAL_timer_set_compare(const uint8_t timer_num, const hal_timer_t compare) {
-  //compare = MIN(compare, HAL_TIMER_TYPE_MAX);
   switch (timer_num) {
   case STEP_TIMER_NUM:
-    timer_set_compare(STEP_TIMER_DEV, STEP_TIMER_CHAN, compare);
-    return;
-  case TEMP_TIMER_NUM:
-    timer_set_compare(TEMP_TIMER_DEV, TEMP_TIMER_CHAN, compare);
-    return;
-  }
-}
-
-FORCE_INLINE static void HAL_timer_set_reload(const uint8_t timer_num, const hal_timer_t compare) {
-  switch (timer_num) {
-  case STEP_TIMER_NUM:
-    timer_set_reload(STEP_TIMER_DEV, compare);
+    // NOTE: By default libmaple sets ARPE = 1, which means the Auto reload register is preloaded
+    //       Without that, the STM32F1 is doing motor shocks (16ms without tick on motors)
+    //       which often cause Layers shifting, on fast moves...
+    if (compare == hal_timer_t(HAL_TIMER_TYPE_MAX)) // first isr call
+      timer_set_compare(STEP_TIMER_DEV, STEP_TIMER_CHAN, compare);
+    else
+      timer_set_reload(STEP_TIMER_DEV, compare); // second isr call (real counter value)
     break;
   case TEMP_TIMER_NUM:
-    timer_set_reload(TEMP_TIMER_DEV, compare);
+    timer_set_compare(TEMP_TIMER_DEV, TEMP_TIMER_CHAN, compare);
     break;
   }
 }

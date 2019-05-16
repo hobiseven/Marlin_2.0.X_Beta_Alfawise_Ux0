@@ -101,15 +101,15 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
     case 3: irq_num = NVIC_TIMER3; break;
     case 4: irq_num = NVIC_TIMER4; break;
     case 5: irq_num = NVIC_TIMER5; break;
-#if defined(STM32_HIGH_DENSITY)
-    // 6 & 7 are basic timers, avoid them
-    case 8: irq_num = NVIC_TIMER8_CC; break;
-#endif
+    #ifdef STM32_HIGH_DENSITY
+      // 6 & 7 are basic timers, avoid them
+      case 8: irq_num = NVIC_TIMER8_CC; break;
+    #endif
     default:
       /**
-       *  We should not get here, add Sanitycheck for timer number. Should be a general timer
-       *  since basic timers do not have CC channels.
-       *  Advanced timers should be skipped if possible too, and are not listed above.
+       * This should never happen. Add a Sanitycheck for timer number.
+       * Should be a general timer since basic timers have no CC channels.
+       * Advanced timers should be skipped if possible too, and are not listed above.
        */
       break;
   }
@@ -218,11 +218,7 @@ timer_dev* get_timer_dev(int number) {
     #if STM32_HAVE_TIMER(14)
       case 14: return &timer14;
     #endif
-      default: {
-        // need to return something...
-        static timer_dev dummy;
-        return &dummy;
-      }
+    default: return nullptr;
   }
 }
 
