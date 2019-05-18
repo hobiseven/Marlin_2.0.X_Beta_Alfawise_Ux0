@@ -591,6 +591,10 @@ void GcodeSuite::process_parsed_command(
         case 303: M303(); break;                                  // M303: PID autotune
       #endif
 
+      #if HAS_USER_THERMISTORS
+        case 305: M305(); break;                                  // M305: Set user thermistor parameters
+      #endif
+
       #if ENABLED(MORGAN_SCARA)
         case 360: if (M360()) return; break;                      // M360: SCARA Theta pos1
         case 361: if (M361()) return; break;                      // M361: SCARA Theta pos2
@@ -807,9 +811,9 @@ void GcodeSuite::process_next_command() {
   if (DEBUGGING(ECHO)) {
     SERIAL_ECHO_START();
     SERIAL_ECHOLN(current_command);
-    #if ENABLED(M100_FREE_MEMORY_WATCHER)
+    #if ENABLED(M100_FREE_MEMORY_DUMPER)
       SERIAL_ECHOPAIR("slot:", cmd_queue_index_r);
-      M100_dump_routine(PSTR("   Command Queue:"), (const char*)command_queue, (const char*)(command_queue + sizeof(command_queue)));
+      M100_dump_routine(PSTR("   Command Queue:"), (const char*)command_queue, (const char*)(command_queue) + sizeof(command_queue));
     #endif
   }
 
@@ -824,10 +828,6 @@ void GcodeSuite::process_next_command() {
    * Run a series of commands, bypassing the command queue to allow
    * G-code "macros" to be called from within other G-code handlers.
    */
-
-  #if !defined(__AVR__) && !defined(strchr_P) // seems required on STM32 platform
-    #define strchr_P(s,c) strchr(s,c)
-  #endif
 
   void GcodeSuite::process_subcommands_now_P(PGM_P pgcode) {
     char * const saved_cmd = parser.command_ptr;        // Save the parser state

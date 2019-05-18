@@ -180,6 +180,17 @@ void spiBeginTransaction(uint32_t spiClock, uint8_t bitOrder, uint8_t dataMode) 
   SPI.beginTransaction(spiConfig);
 }
 
+/**
+ * @brief  Avoid noisy arduinoststm32-maple -Wunused-variable
+ */
+void spiMappleWarningsFix() {
+  if (ff != 0xFF && _spi1_this && _spi2_this
+  #if BOARD_NR_SPI >= 3
+    && _spi3_this
+  #endif
+  ) return;
+}
+
 #endif // SOFTWARE_SPI
 
 #endif // __STM32F1__

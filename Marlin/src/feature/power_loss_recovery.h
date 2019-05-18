@@ -34,15 +34,7 @@
 
 //#define DEBUG_POWER_LOSS_RECOVERY
 //#define SAVE_EACH_CMD_MODE
-#ifndef SAVE_INFO_INTERVAL_MS
-#define SAVE_INFO_INTERVAL_MS 0
-#endif
-#ifndef POWER_LOSS_PURGE_LEN
-#define POWER_LOSS_PURGE_LEN 20
-#endif
-#ifndef POWER_LOSS_RETRACT_LEN
-#define POWER_LOSS_RETRACT_LEN 10
-#endif
+//#define SAVE_INFO_INTERVAL_MS 0
 
 typedef struct {
   uint8_t valid_head;
@@ -59,8 +51,8 @@ typedef struct {
 
   uint16_t feedrate;
 
-  #if HOTENDS > 1
-    uint8_t active_hotend;
+  #if EXTRUDERS > 1
+    uint8_t active_extruder;
   #endif
 
   int16_t target_temperature[HOTENDS];

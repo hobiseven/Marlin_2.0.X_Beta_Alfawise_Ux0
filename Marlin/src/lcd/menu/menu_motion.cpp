@@ -261,9 +261,9 @@ void _menu_move_distance(const AxisEnum axis, const screenFunc_t func, const int
     }
   }
   #if ENABLED(PREVENT_COLD_EXTRUSION)
-  if (axis == E_AXIS && thermalManager.tooColdToExtrude(eindex >= 0 ? eindex : active_extruder))
-    MENU_BACK(MSG_HOTEND_TOO_COLD);
-  else
+    if (axis == E_AXIS && thermalManager.tooColdToExtrude(eindex >= 0 ? eindex : active_extruder))
+      MENU_BACK(MSG_HOTEND_TOO_COLD);
+    else
   #endif
   {
     MENU_BACK(MSG_MOVE_AXIS);

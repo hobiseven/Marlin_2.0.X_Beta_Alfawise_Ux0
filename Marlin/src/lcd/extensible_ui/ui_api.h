@@ -46,6 +46,11 @@
 #include "../../inc/MarlinConfig.h"
 
 namespace ExtUI {
+  // The ExtUI implementation can store up to this many bytes
+  // in the EEPROM when the methods onStoreSettings and
+  // onLoadSettings are called.
+
+  static constexpr size_t eeprom_data_size = 48;
 
   enum axis_t     : uint8_t { X, Y, Z };
   enum extruder_t : uint8_t { E0, E1, E2, E3, E4, E5 };
@@ -56,6 +61,10 @@ namespace ExtUI {
   constexpr uint8_t hotendCount   = HOTENDS;
   constexpr uint8_t fanCount      = FAN_COUNT;
 
+  #if HAS_MESH
+    typedef float (&bed_mesh_t)[GRID_MAX_POINTS_X][GRID_MAX_POINTS_Y];
+  #endif
+
   bool isMoving();
   bool isAxisPositionKnown(const axis_t);
   bool isPositionKnown(); // Axis position guaranteed, steppers active since homing
@@ -64,6 +73,11 @@ namespace ExtUI {
   bool canMove(const extruder_t);
   void enqueueCommands_P(PGM_P const);
   bool commandsInQueue();
+
+  bool isHeaterIdle(const heater_t);
+  bool isHeaterIdle(const extruder_t);
+  void enableHeater(const heater_t);
+  void enableHeater(const extruder_t);
 
   /**
    * Getters and setters
@@ -112,9 +126,8 @@ namespace ExtUI {
   #if HAS_LEVELING
     bool getLevelingActive();
     void setLevelingActive(const bool);
+    bool getMeshValid();
     #if HAS_MESH
-      #include "../../feature/bedlevel/bedlevel.h"
-      bool getMeshValid();
       bed_mesh_t getMeshArray();
       float getMeshPoint(const uint8_t xpos, const uint8_t ypos);
       void setMeshPoint(const uint8_t xpos, const uint8_t ypos, const float zval);
@@ -283,8 +296,10 @@ namespace ExtUI {
   void onUserConfirmRequired(const char * const msg);
   void onStatusChanged(const char * const msg);
   void onFactoryReset();
-  void onStoreSettings();
-  void onLoadSettings();
+  void onStoreSettings(char *);
+  void onLoadSettings(const char *);
+  void onConfigurationStoreWritten(bool success);
+  void onConfigurationStoreRead(bool success);
 };
 
 /**

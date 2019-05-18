@@ -28,6 +28,9 @@
   #define BOARD_NAME "BIGTREE SKR V1.3"
 #endif
 
+// Ignore temp readings during develpment.
+//#define BOGUS_TEMPERATURE_FAILSAFE_OVERRIDE
+
 //
 // Servos
 //
@@ -204,11 +207,16 @@
     #if ENABLED(FYSETC_MINI_12864)
       #define DOGLCD_CS    P1_18
       #define DOGLCD_A0    P1_19
+      #define DOGLCD_SCK   P0_15
+      #define DOGLCD_MOSI  P0_18
+      #define FORCE_SOFT_SPI
 
       #define LCD_BACKLIGHT_PIN -1
 
+      #define FORCE_SOFT_SPI      // Use this if default of hardware SPI causes display problems
+                                  //   results in LCD soft SPI mode 3, SD soft SPI mode 0
+
       #define LCD_RESET_PIN P1_20   // Must be high or open for LCD to operate normally.
-                                    // Seems to work best if left open.
 
       #if EITHER(FYSETC_MINI_12864_1_2, FYSETC_MINI_12864_2_0)
         #ifndef RGB_LED_R_PIN
