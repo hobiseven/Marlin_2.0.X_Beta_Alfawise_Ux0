@@ -1341,7 +1341,7 @@ void Temperature::updateTemperaturesFromRawValues() {
 
 // Init fans according to whether they're native PWM or Software PWM
 #ifdef ALFAWISE_UX0
-#define _INIT_SOFT_FAN(P) OUT_WRITE_OPEN_DRAIN(P, FAN_INVERTING ? LOW : HIGH)
+#define _INIT_SOFT_FAN(P) OUT_WRITE_OD(P, FAN_INVERTING ? LOW : HIGH)
 #else
 #define _INIT_SOFT_FAN(P) OUT_WRITE(P, FAN_INVERTING ? LOW : HIGH)
 #endif
@@ -1359,7 +1359,7 @@ void Temperature::updateTemperaturesFromRawValues() {
 #if EXTRUDER_AUTO_FAN_SPEED != 255
   #define INIT_AUTO_FAN_PIN(P) do{ if (P == FAN1_PIN || P == FAN2_PIN) { SET_PWM(P); SET_FAST_PWM_FREQ(FAST_PWM_FAN_FREQUENCY); } else SET_OUTPUT(P); }while(0)
 #elif defined(ALFAWISE_UX0)
-  #define INIT_AUTO_FAN_PIN(P) SET_OUTPUT_OPEN_DRAIN(P)
+  #define INIT_AUTO_FAN_PIN(P) SET_OUTPUT_OD(P)
 #else
   #define INIT_AUTO_FAN_PIN(P) SET_OUTPUT(P)
 #endif
@@ -1391,7 +1391,7 @@ void Temperature::init() {
 
   #if HAS_HEATER_0
   #ifdef ALFAWISE_UX0
-    OUT_WRITE_OPEN_DRAIN(HEATER_0_PIN, HEATER_0_INVERTING);
+    OUT_WRITE_OD(HEATER_0_PIN, HEATER_0_INVERTING);
   #else
     OUT_WRITE(HEATER_0_PIN, HEATER_0_INVERTING);
   #endif
@@ -1415,7 +1415,7 @@ void Temperature::init() {
 
   #if HAS_HEATED_BED
   #ifdef ALFAWISE_UX0
-    OUT_WRITE_OPEN_DRAIN(HEATER_BED_PIN, HEATER_BED_INVERTING);
+    OUT_WRITE_OD(HEATER_BED_PIN, HEATER_BED_INVERTING);
   #else
     OUT_WRITE(HEATER_BED_PIN, HEATER_BED_INVERTING);
   #endif
