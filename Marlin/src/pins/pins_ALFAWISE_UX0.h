@@ -94,6 +94,16 @@
 
 #define LED_PIN           PC2 // pin 17
 
+//
+// PWM
+//
+#ifndef BEEPER_PIN
+#define NUM_SERVOS          1
+#define SERVO0_PIN       PD13 // Open drain PWM pin on the V0G (GND or floating 5V)
+#define SERVO0_PWM_TM  timer8 // Advanced timer to use (1 or 8)
+#define SERVO0_PWM_IRQ NVIC_TIMER8_CC // Interrupt reg, should match timer num
+#endif
+
 /**
  * Note: Alfawise TFT screens may have 6 different TFT controllers
  * If the screen stays white, disable 'LCD_RESET_PIN' to rely on the bootloader to do screen initialization.

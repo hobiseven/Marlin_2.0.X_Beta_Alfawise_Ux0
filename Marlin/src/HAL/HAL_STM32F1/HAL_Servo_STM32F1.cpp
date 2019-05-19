@@ -46,7 +46,7 @@ uint8_t ServoCount = 0;
  *
  * This uses the smallest prescaler that allows an overflow < 2^16.
  */
-#define MAX_OVERFLOW    ((1 << 16) - 1)
+#define MAX_OVERFLOW    UINT16_MAX //((1 << 16) - 1)
 #define CYC_MSEC        (1000 * CYCLES_PER_MICROSECOND)
 #define TAU_MSEC        20
 #define TAU_USEC        (TAU_MSEC * 1000)
@@ -62,22 +62,41 @@ uint8_t ServoCount = 0;
 #define US_TO_ANGLE(us)   ((int16_t)(map((us), SERVO_DEFAULT_MIN_PW, SERVO_DEFAULT_MAX_PW,  \
                                        this->minAngle, this->maxAngle)))
 
+void libServo::servoWrite(uint8_t pin, uint16_t duty_cycle) {
+  if (pin >= BOARD_NR_GPIO_PINS) return;
+  #ifdef SERVO0_PWM_TM
+    this->pwmSetDuty(duty_cycle);
+  #else
+    timer_dev *tdev = PIN_MAP[pin].timer_device;
+    uint8_t tchan = PIN_MAP[pin].timer_channel;
+    if (tdev) timer_set_compare(tdev, tchan, duty_cycle);
+  #endif
+}
+
 libServo::libServo() {
   this->servoIndex = ServoCount < MAX_SERVOS ? ServoCount++ : INVALID_SERVO;
 }
 
 bool libServo::attach(const int32_t pin, const int32_t minAngle, const int32_t maxAngle) {
   if (this->servoIndex >= MAX_SERVOS) return false;
-  if (!PWM_PIN(pin)) return false;
 
   this->minAngle = minAngle;
   this->maxAngle = maxAngle;
+  this->angle = -1;
+
+  if (!PWM_PIN(pin)) {
+    #ifdef SERVO0_PWM_TM
+      return this->setupSoftPWM(pin);
+    #else
+      return false;
+    #endif
+  }
 
   timer_dev *tdev = PIN_MAP[pin].timer_device;
   uint8_t tchan = PIN_MAP[pin].timer_channel;
 
-  pinMode(pin, PWM);
-  pwmWrite(pin, 0);
+  SET_PWM(pin);
+  servoWrite(pin, 0);
 
   timer_pause(tdev);
   timer_set_prescaler(tdev, SERVO_PRESCALER - 1); // prescaler is 1-based
@@ -92,12 +111,16 @@ bool libServo::attach(const int32_t pin, const int32_t minAngle, const int32_t m
 
 bool libServo::detach() {
   if (!this->attached()) return false;
-  pwmWrite(this->pin, 0);
+  this->angle = -1;
+  servoWrite(this->pin, 0);
   return true;
 }
 
 int32_t libServo::read() const {
   if (this->attached()) {
+    #ifdef SERVO0_PWM_TM
+      return this->angle;
+    #endif
     timer_dev *tdev = PIN_MAP[this->pin].timer_device;
     uint8_t tchan = PIN_MAP[this->pin].timer_channel;
     return US_TO_ANGLE(COMPARE_TO_US(timer_get_compare(tdev, tchan)));
@@ -110,13 +133,84 @@ void libServo::move(const int32_t value) {
   static_assert(COUNT(servo_delay) == NUM_SERVOS, "SERVO_DELAY must be an array NUM_SERVOS long.");
 
   if (this->attached()) {
-    pwmWrite(this->pin, US_TO_COMPARE(ANGLE_TO_US(constrain(value, this->minAngle, this->maxAngle))));
+    this->angle = constrain(value, this->minAngle, this->maxAngle);
+    servoWrite(this->pin, US_TO_COMPARE(ANGLE_TO_US(this->angle)));
     safe_delay(servo_delay[this->servoIndex]);
     #if ENABLED(DEACTIVATE_SERVOS_AFTER_MOVE)
       this->detach();
     #endif
   }
 }
+
+#ifdef SERVO0_PWM_TM
+  extern "C" void Servo_IRQHandler(void) {
+    timer_dev *tdev = &(SERVO0_PWM_TM);
+    uint16_t SR = timer_get_status(tdev);
+    if (SR & TIMER_SR_CC1IF) { // channel 1 off
+      OUT_WRITE_OD(SERVO0_PIN, 1);
+      timer_reset_status_bit(tdev, TIMER_SR_CC1IF_BIT);
+    }
+    if (SR & TIMER_SR_CC2IF) { // channel 2 resume
+      OUT_WRITE_OD(SERVO0_PIN, 0);
+      timer_reset_status_bit(tdev, TIMER_SR_CC2IF_BIT);
+    }
+  }
+
+  bool libServo::setupSoftPWM(const int32_t pin) {
+    timer_dev *tdev = &(SERVO0_PWM_TM);
+    #ifdef SERVO0_PWM_IRQ
+      nvic_irq_num irq_num = SERVO0_PWM_IRQ;
+      nvic_irq_set_priority(irq_num, 7);
+    #endif
+
+    OUT_WRITE_OD(pin, 1);
+
+    timer_pause(tdev);
+    timer_set_mode(tdev, 1, TIMER_OUTPUT_COMPARE); // counter with isr
+    timer_oc_set_mode(tdev, 1, TIMER_OC_MODE_FROZEN, 0); // no pin output change
+    timer_oc_set_mode(tdev, 2, TIMER_OC_MODE_FROZEN, 0); // no pin output change
+    timer_set_prescaler(tdev, SERVO_PRESCALER - 1); // prescaler is 1-based
+    timer_set_reload(tdev, SERVO_OVERFLOW);
+    timer_set_compare(tdev, 1, SERVO_OVERFLOW);
+    timer_set_compare(tdev, 2, SERVO_OVERFLOW);
+    timer_attach_interrupt(tdev, 1, Servo_IRQHandler);
+    timer_attach_interrupt(tdev, 2, Servo_IRQHandler);
+    timer_generate_update(tdev);
+    timer_resume(tdev);
+
+    this->pin = pin; // set attached()
+
+    return true;
+  }
+
+  void libServo::pwmSetDuty(const uint16_t duty_cycle) {
+    timer_dev *tdev = &(SERVO0_PWM_TM);
+
+    timer_set_compare(tdev, 1, duty_cycle);
+    timer_generate_update(tdev);
+    if (duty_cycle) {
+      timer_enable_irq(tdev, 1);
+      timer_enable_irq(tdev, 2);
+    } else {
+      timer_disable_irq(tdev, 1);
+      timer_disable_irq(tdev, 2);
+
+      OUT_WRITE_OD(this->pin, 1); // off
+    }
+  }
+
+  void libServo::pauseSoftPWM() { // detach
+    timer_dev *tdev = &(SERVO0_PWM_TM);
+    timer_pause(tdev);
+    pwmSetDuty(0);
+  }
+
+#else
+  bool libServo::setupSoftPWM(const int32_t pin) {}
+  void libServo::pwmSetDuty(const uint16_t duty_cycle) {}
+  void libServo::pauseSoftPWM() {}
+#endif
+
 #endif // HAS_SERVOS
 
 #endif // __STM32F1__
