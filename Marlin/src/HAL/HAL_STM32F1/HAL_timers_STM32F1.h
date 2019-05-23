@@ -130,8 +130,8 @@ FORCE_INLINE static void HAL_timer_set_compare(const uint8_t timer_num, const ha
   switch (timer_num) {
   case STEP_TIMER_NUM:
     // NOTE: WE set libmaple sets ARPE = O, which means the Auto reload register is not preloaded
-    // and there is no need to use any compare, as in basic timer mode, reaching ARR triggers 0 reload
-    // and update event. ISR epilogue is therefore empty.
+    // and there is no need to use any compare, as in the timer mode used, setting ARR to the compare value
+    // will result in exactly the same effect, ie trigerring an interrupt, and on top, set counter to 0
       timer_set_reload(STEP_TIMER_DEV, compare); // We reload direct ARR as needed during counting up
     break;
   case TEMP_TIMER_NUM:
@@ -154,8 +154,8 @@ FORCE_INLINE static hal_timer_t HAL_timer_get_compare(const uint8_t timer_num) {
 FORCE_INLINE static void HAL_timer_isr_prologue(const uint8_t timer_num) {
   switch (timer_num) {
   case STEP_TIMER_NUM:
-    // Nothing to be done, as counter returns to 0 automatically when CNT=ARR
-    timer_generate_update(STEP_TIMER_DEV);
+    // No counter to clear, as this is already done when CNT = ARR > CNT =0 + IT
+    timer_generate_update(STEP_TIMER_DEV); // This is apparently still needed
     return;
   case TEMP_TIMER_NUM:
     timer_set_count(TEMP_TIMER_DEV, 0);
@@ -172,4 +172,4 @@ FORCE_INLINE static void timer_no_ARR_preload_ARPE(timer_dev *dev) {
     *bb_perip(&(dev->regs).bas->CR1,TIMER_CR1_ARPE_BIT) = 0;
 }
 
-#define TIMER_OC_NO_PRELOAD 0
+#define TIMER_OC_NO_PRELOAD 0 // Need to disable preload also on compare registers. 
