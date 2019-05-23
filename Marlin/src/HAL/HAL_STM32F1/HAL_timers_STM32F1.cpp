@@ -126,8 +126,9 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
       timer_set_count(STEP_TIMER_DEV, 0);
       timer_set_prescaler(STEP_TIMER_DEV, (uint16_t)(STEPPER_TIMER_PRESCALE - 1));
       timer_set_reload(STEP_TIMER_DEV, 0xFFFF);
-      timer_oc_set_mode(STEP_TIMER_DEV, STEP_TIMER_CHAN, TIMER_OC_MODE_FROZEN, TIMER_OC_PE); // no output pin change, enable preload
+      timer_oc_set_mode(STEP_TIMER_DEV, STEP_TIMER_CHAN, TIMER_OC_MODE_FROZEN, TIMER_OC_NO_PRELOAD); // no output pin change, enable preload
       timer_set_compare(STEP_TIMER_DEV, STEP_TIMER_CHAN, MIN(hal_timer_t(HAL_TIMER_TYPE_MAX), (STEPPER_TIMER_RATE / frequency)));
+      timer_no_ARR_preload_ARPE(STEP_TIMER_DEV); //Needed to be sure no preload on ARR register.
       timer_attach_interrupt(STEP_TIMER_DEV, STEP_TIMER_CHAN, stepTC_Handler);
       nvic_irq_set_priority(irq_num, STEP_TIMER_IRQ_PRIO);
       timer_generate_update(STEP_TIMER_DEV);

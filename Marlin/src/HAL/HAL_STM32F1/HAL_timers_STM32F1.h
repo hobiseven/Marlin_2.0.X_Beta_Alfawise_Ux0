@@ -129,16 +129,13 @@ bool HAL_timer_interrupt_enabled(const uint8_t timer_num);
 FORCE_INLINE static void HAL_timer_set_compare(const uint8_t timer_num, const hal_timer_t compare) {
   switch (timer_num) {
   case STEP_TIMER_NUM:
-    // NOTE: By default libmaple sets ARPE = 1, which means the Auto reload register is preloaded
-    //       Without that, the STM32F1 is doing motor shocks (16ms without tick on motors)
-    //       which often cause Layers shifting, on fast moves...
-    if (compare == hal_timer_t(HAL_TIMER_TYPE_MAX)) // first isr call
-      timer_set_compare(STEP_TIMER_DEV, STEP_TIMER_CHAN, compare);
-    else
-      timer_set_reload(STEP_TIMER_DEV, compare); // second isr call (real counter value)
+    // NOTE: WE set libmaple sets ARPE = O, which means the Auto reload register is not preloaded
+    // and there is no need to use any compare, as in basic timer mode, reaching ARR triggers 0 reload
+    // and update event. ISR epilogue is therefore empty.
+      timer_set_reload(STEP_TIMER_DEV, compare); // We reload direct ARR as needed during counting up
     break;
   case TEMP_TIMER_NUM:
-    timer_set_compare(TEMP_TIMER_DEV, TEMP_TIMER_CHAN, compare);
+    timer_set_compare(TEMP_TIMER_DEV, TEMP_TIMER_CHAN, compare); // Might need to check TEMP timer settings!
     break;
   }
 }
@@ -157,7 +154,7 @@ FORCE_INLINE static hal_timer_t HAL_timer_get_compare(const uint8_t timer_num) {
 FORCE_INLINE static void HAL_timer_isr_prologue(const uint8_t timer_num) {
   switch (timer_num) {
   case STEP_TIMER_NUM:
-    timer_set_count(STEP_TIMER_DEV, 0);
+    // Nothing to be done, as counter returns to 0 automatically when CNT=ARR
     timer_generate_update(STEP_TIMER_DEV);
     return;
   case TEMP_TIMER_NUM:
@@ -168,3 +165,11 @@ FORCE_INLINE static void HAL_timer_isr_prologue(const uint8_t timer_num) {
 }
 
 #define HAL_timer_isr_epilogue(TIMER_NUM)
+
+// No command is available in timers.cpp to turn off ARPE bit, which is turned on by default in libmaple.
+// Needed here to be sure ARPE=0 for stepper timer
+FORCE_INLINE static void timer_no_ARR_preload_ARPE(timer_dev *dev) {
+    *bb_perip(&(dev->regs).bas->CR1,TIMER_CR1_ARPE_BIT) = 0;
+}
+
+#define TIMER_OC_NO_PRELOAD 0
