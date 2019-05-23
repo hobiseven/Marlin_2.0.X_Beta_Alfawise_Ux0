@@ -103,6 +103,24 @@ float zprobe_zoffset; // Initialized by settings.load()
     #endif
   }
 
+#elif ENABLED(TOUCHMI_PROBE)
+  void run_deploy_moves_script() {
+    #if ENABLED(TOUCHMI_POSITION_RIGHT)
+      do_blocking_move_to_x(TOUCHMI_PROBE_DEPLOY_X);
+    #else
+      do_blocking_move_to_x(X_MIN_BED);
+    #endif
+  }
+  void run_stow_moves_script() {
+    endstops.enable_z_probe(false);
+    #define TOUCHMI_POSITION_BEFORE_PROBE_Z current_position[Z_AXIS]
+    #define TOUCHMI_POSITION_BEFORE_PROBE_X current_position[X_AXIS]
+    #define TOUCHMI_POSITION_BEFORE_PROBE_Y current_position[Y_AXIS]
+    const float TOUCHMI_RETURN_POSITION[] = { TOUCHMI_POSITION_BEFORE_PROBE_X,TOUCHMI_POSITION_BEFORE_PROBE_Y, TOUCHMI_POSITION_BEFORE_PROBE_Z };
+    do_blocking_move_to_z(PROBE_RETRACT_HEIGHT, MMM_TO_MMS(HOMING_FEEDRATE_Z));
+    do_blocking_move_to(TOUCHMI_RETURN_POSITION, MMM_TO_MMS(HOMING_FEEDRATE_Z));
+  }
+
 #elif ENABLED(Z_PROBE_ALLEN_KEY)
 
   void run_deploy_moves_script() {
@@ -373,6 +391,10 @@ FORCE_INLINE void probe_specific_action(const bool deploy) {
   #elif ENABLED(RACK_AND_PINION_PROBE)
 
     do_blocking_move_to_x(deploy ? Z_PROBE_DEPLOY_X : Z_PROBE_RETRACT_X);
+
+  #elif ENABLED(TOUCHMI_PROBE)
+
+    deploy ? run_deploy_moves_script() : run_stow_moves_script();
 
   #elif DISABLED(PAUSE_BEFORE_DEPLOY_STOW)
 

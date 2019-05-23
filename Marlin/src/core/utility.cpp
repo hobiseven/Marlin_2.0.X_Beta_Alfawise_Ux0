@@ -338,6 +338,8 @@ void safe_delay(millis_t ms) {
         "Z_PROBE_SLED"
       #elif ENABLED(Z_PROBE_ALLEN_KEY)
         "Z_PROBE_ALLEN_KEY"
+      #elif ENABLED(TOUCHMI_PROBE)
+        "TOUCHMI_PROBE"
       #else
         "NONE"
       #endif

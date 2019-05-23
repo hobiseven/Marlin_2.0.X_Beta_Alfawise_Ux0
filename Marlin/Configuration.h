@@ -696,10 +696,10 @@
 #define X_MIN_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
 #define Y_MIN_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
 #define Z_MIN_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
-#define X_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
-#define Y_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
-#define Z_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
-#define Z_MIN_PROBE_ENDSTOP_INVERTING false // set to true to invert the logic of the probe.
+#define X_MAX_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
+#define Y_MAX_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
+#define Z_MAX_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
+#define Z_MIN_PROBE_ENDSTOP_INVERTING true // set to true to invert the logic of the probe.
 
 /**
  * Stepper Drivers
@@ -926,6 +926,32 @@
   #define Z_PROBE_RETRACT_X X_MAX_POS
 #endif
 
+/**
+ * Touch-MI
+ * A probe deployed by moving the x-axis and activated with a magnet placed on the right or left.
+ *
+ * If activation magnet is on the RIGHT enable magnet position with:
+ * #define Z_PROBE_POSITION_RIGHT
+ *
+ * Z_SAFE_HOMING must be enabled to not home outside the bed.
+ * PROBE_RETRACT_HEIGHT need to defined to retract the probe.
+ * Z_HOMING_HEIGHT must be defined to a minimum of 10.
+ * MIN_PROBE_EDGE must be defined and BOUNDARIES defined (where the probe can reach).
+ * TOUCHMI_POSITION_RIGHT needs TOUCHMI_PROBE_DEPLOY_X to be defined.
+ */
+
+//#define TOUCHMI_PROBE
+
+#if ENABLED(TOUCHMI_PROBE)
+  #define PROBE_RETRACT_HEIGHT  1   // Height at witch the probre retract
+  #define TOUCHMI_POSITION_RIGHT    // If your Touch-MI is on the right of the Bed
+  #undef PROBE_MANUALLY
+  #undef MANUAL_PROBE_START_Z
+#endif
+#if ENABLED(TOUCHMI_POSITION_RIGHT)
+  #define TOUCHMI_PROBE_DEPLOY_X X_MAX_BED // X_MAX_BED or (X_MAX_BED + X) if magnet is outside the BED.
+#endif
+
 //
 // For Z_PROBE_ALLEN_KEY see the Delta example configurations.
 //
@@ -1063,7 +1089,7 @@
 
 //#define UNKNOWN_Z_NO_RAISE // Don't raise Z (lower the bed) if Z is "unknown." For beds that fall when Z is powered off.
 
-//#define Z_HOMING_HEIGHT 4  // (mm) Minimal Z height before homing (G28) for Z clearance above the bed, clamps, ...
+//#define Z_HOMING_HEIGHT 10 // (mm) Minimal Z height before homing (G28) for Z clearance above the bed, clamps, ...
                              // Be sure you have this distance over your Z_MAX_POS in case.
 
 // Direction of endstops when homing; 1=MAX, -1=MIN
