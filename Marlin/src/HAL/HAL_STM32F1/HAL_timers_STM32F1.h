@@ -129,10 +129,10 @@ bool HAL_timer_interrupt_enabled(const uint8_t timer_num);
 FORCE_INLINE static void HAL_timer_set_compare(const uint8_t timer_num, const hal_timer_t compare) {
   switch (timer_num) {
   case STEP_TIMER_NUM:
-    // NOTE: WE set libmaple sets ARPE = O, which means the Auto reload register is not preloaded
+    // NOTE: WE set ARPE = O, which means the Auto reload register is not preloaded
     // and there is no need to use any compare, as in the timer mode used, setting ARR to the compare value
     // will result in exactly the same effect, ie trigerring an interrupt, and on top, set counter to 0
-      timer_set_reload(STEP_TIMER_DEV, compare); // We reload direct ARR as needed during counting up
+    timer_set_reload(STEP_TIMER_DEV, compare); // We reload direct ARR as needed during counting up
     break;
   case TEMP_TIMER_NUM:
     timer_set_compare(TEMP_TIMER_DEV, TEMP_TIMER_CHAN, compare); // Might need to check TEMP timer settings!
@@ -140,6 +140,7 @@ FORCE_INLINE static void HAL_timer_set_compare(const uint8_t timer_num, const ha
   }
 }
 
+/* unused in Marlin yet */
 FORCE_INLINE static hal_timer_t HAL_timer_get_compare(const uint8_t timer_num) {
   switch (timer_num) {
   case STEP_TIMER_NUM:
@@ -154,7 +155,7 @@ FORCE_INLINE static hal_timer_t HAL_timer_get_compare(const uint8_t timer_num) {
 FORCE_INLINE static void HAL_timer_isr_prologue(const uint8_t timer_num) {
   switch (timer_num) {
   case STEP_TIMER_NUM:
-    // No counter to clear, as this is already done when CNT = ARR > CNT =0 + IT
+    // No counter to clear, as this is already done when CNT = ARR > CNT = 0 + IT
     timer_generate_update(STEP_TIMER_DEV); // This is apparently still needed
     return;
   case TEMP_TIMER_NUM:
@@ -169,7 +170,7 @@ FORCE_INLINE static void HAL_timer_isr_prologue(const uint8_t timer_num) {
 // No command is available in timers.cpp to turn off ARPE bit, which is turned on by default in libmaple.
 // Needed here to be sure ARPE=0 for stepper timer
 FORCE_INLINE static void timer_no_ARR_preload_ARPE(timer_dev *dev) {
-    *bb_perip(&(dev->regs).bas->CR1,TIMER_CR1_ARPE_BIT) = 0;
+  *bb_perip(&(dev->regs).bas->CR1,TIMER_CR1_ARPE_BIT) = 0;
 }
 
-#define TIMER_OC_NO_PRELOAD 0 // Need to disable preload also on compare registers. 
+#define TIMER_OC_NO_PRELOAD 0 // Need to disable preload also on compare registers.
