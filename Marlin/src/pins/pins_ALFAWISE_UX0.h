@@ -97,12 +97,13 @@
 //
 // PWM
 //
-#ifndef BEEPER_PIN
 #define NUM_SERVOS          1
+#define SERVO0_TIMER_NUM    8 // General or Adv. timer to use for the servo PWM (2 & 5 are reserved)
+
+#define SERVO0_PWM_OD
 #define SERVO0_PIN       PD13 // Open drain PWM pin on the V0G (GND or floating 5V)
-#define SERVO0_PWM_TM  timer8 // Advanced timer to use (1 or 8)
-#define SERVO0_PWM_IRQ NVIC_TIMER8_CC // Interrupt reg, should match timer num
-#endif
+
+//#define SERVO0_PIN      PE5 // Pulled up PWM pin on the V08 (3.3V or 0)
 
 /**
  * Note: Alfawise TFT screens may have 6 different TFT controllers
