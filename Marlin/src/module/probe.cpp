@@ -104,13 +104,12 @@ float zprobe_zoffset; // Initialized by settings.load()
   }
 
 #elif ENABLED(TOUCHMI_PROBE)
-  //#include "../../src/lcd/menu/menu.h"
-
   void run_deploy_moves_script() {
     #if ENABLED(TOUCHMI_POSITION_RIGHT)
       do_blocking_move_to_x(TOUCHMI_PROBE_DEPLOY_X);
     #elif ENABLED(TOUCHMI_MANUAL_DEPLOY)
-      void menu_touchmi();
+      extern void menu_touchmi();
+
       PGM_P const touchmi_str = PSTR(MSG_MANUAL_DEPLOY_TOUCHMI);
       ui.return_to_status(); // To display the new status message
       ui.set_status_P(touchmi_str, 99);
@@ -124,6 +123,8 @@ float zprobe_zoffset; // Initialized by settings.load()
       ui.return_to_status();
       KEEPALIVE_STATE(IN_HANDLER);
       ui.goto_screen(menu_touchmi); // Go back to Menu
+    #else
+      do_blocking_move_to_x(X_MIN_BED);
     #endif
   }
   void run_stow_moves_script() {

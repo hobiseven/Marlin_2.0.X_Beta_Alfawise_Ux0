@@ -944,9 +944,9 @@
 
 #if ENABLED(TOUCHMI_PROBE)
   #define PROBE_RETRACT_HEIGHT  1   // Height at witch the probre retract
-  #define TOUCHMI_POSITION_RIGHT    // If your Touch-MI is on the right of the Bed
+  //#define TOUCHMI_POSITION_RIGHT  // If your Touch-MI is on the right of the Bed
+  //#define TOUCHMI_MANUAL_DEPLOY   // For manual deploy
   #undef PROBE_MANUALLY
-  #undef MANUAL_PROBE_START_Z
 #endif
 #if ENABLED(TOUCHMI_POSITION_RIGHT)
   #define TOUCHMI_PROBE_DEPLOY_X X_MAX_BED // X_MAX_BED or (X_MAX_BED + X) if magnet is outside the BED.
