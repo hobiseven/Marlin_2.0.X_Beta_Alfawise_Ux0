@@ -38,7 +38,7 @@
 #include "../gcode/gcode.h"
 #include "../lcd/ultralcd.h"
 
-#if ANY(Z_PROBE_SLED, Z_PROBE_ALLEN_KEY, PROBE_TRIGGERED_WHEN_STOWED_TEST) || (QUIET_PROBING && ENABLED(PROBING_STEPPERS_OFF))
+#if ANY(Z_PROBE_SLED, Z_PROBE_ALLEN_KEY, PROBE_TRIGGERED_WHEN_STOWED_TEST, TOUCHMI_PROBE) || (QUIET_PROBING && ENABLED(PROBING_STEPPERS_OFF))
   #include "../Marlin.h" // for stop(), disable_e_steppers
 #endif
 
@@ -104,14 +104,32 @@ float zprobe_zoffset; // Initialized by settings.load()
   }
 
 #elif ENABLED(TOUCHMI_PROBE)
+  //#include "../../src/lcd/menu/menu.h"
+
   void run_deploy_moves_script() {
     #if ENABLED(TOUCHMI_POSITION_RIGHT)
       do_blocking_move_to_x(TOUCHMI_PROBE_DEPLOY_X);
-    #else
-      do_blocking_move_to_x(X_MIN_BED);
+    #elif ENABLED(TOUCHMI_MANUAL_DEPLOY)
+      void menu_touchmi();
+      PGM_P const touchmi_str = PSTR(MSG_MANUAL_DEPLOY_TOUCHMI);
+      ui.return_to_status(); // To display the new status message
+      ui.set_status_P(touchmi_str, 99);
+      serialprintPGM(touchmi_str);
+      SERIAL_EOL();
+
+      KEEPALIVE_STATE(PAUSED_FOR_USER);
+      wait_for_user = true;
+      while (wait_for_user) idle();
+      ui.reset_status();
+      ui.return_to_status();
+      KEEPALIVE_STATE(IN_HANDLER);
+      ui.goto_screen(menu_touchmi); // Go back to Menu
     #endif
   }
   void run_stow_moves_script() {
+    #if ENABLED(TOUCHMI_POSITION_RIGHT)
+      endstops.enable_globally(false);
+    #endif
     endstops.enable_z_probe(false);
     #define TOUCHMI_POSITION_BEFORE_PROBE_Z current_position[Z_AXIS]
     #define TOUCHMI_POSITION_BEFORE_PROBE_X current_position[X_AXIS]

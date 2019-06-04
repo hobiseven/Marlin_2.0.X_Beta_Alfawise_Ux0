@@ -1048,6 +1048,9 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
     #if Z_HOMING_HEIGHT < 10
       #error "Z_HOMING_HEIGHT too low, please set to minimum 10"
     #endif
+    #if ENABLED(TOUCHMI_MANUAL_DEPLOY) && ENABLED(TOUCHMI_POSITION_RIGHT)
+      #error "TouchMI can't be configured automaticaly and manualy at the same time."
+    #endif
   #endif
 
   /**
