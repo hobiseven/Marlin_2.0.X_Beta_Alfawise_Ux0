@@ -34,11 +34,7 @@
 void GcodeSuite::G92() {
 
   bool didE = false;
-  #if IS_SCARA || !HAS_POSITION_SHIFT
-    bool didXYZ = false;
-  #else
-    constexpr bool didXYZ = false;
-  #endif
+  bool didXYZ = false;
 
   #if USE_GCODE_SUBCODES
     const uint8_t subcode_G92 = parser.subcode;
@@ -67,11 +63,7 @@ void GcodeSuite::G92() {
         LOOP_XYZE(i) {
           if (parser.seenval(axis_codes[i])) {
             current_position[i] = parser.value_axis_units((AxisEnum)i);
-            #if IS_SCARA || !HAS_POSITION_SHIFT
-              if (i == E_AXIS) didE = true; else didXYZ = true;
-            #elif HAS_POSITION_SHIFT
-              if (i == E_AXIS) didE = true;
-            #endif
+            if (i == E_AXIS) didE = true; else didXYZ = true;
           }
         }
       } break;
