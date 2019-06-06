@@ -105,9 +105,7 @@ float zprobe_zoffset; // Initialized by settings.load()
 
 #elif ENABLED(TOUCHMI_PROBE)
   void run_deploy_moves_script() {
-    #if ENABLED(TOUCHMI_POSITION_RIGHT)
-      do_blocking_move_to_x(TOUCHMI_PROBE_DEPLOY_X);
-    #elif ENABLED(TOUCHMI_MANUAL_DEPLOY)
+    #if ENABLED(TOUCHMI_MANUAL_DEPLOY)
       extern void menu_touchmi();
 
       PGM_P const touchmi_str = PSTR(MSG_MANUAL_DEPLOY_TOUCHMI);
@@ -123,19 +121,21 @@ float zprobe_zoffset; // Initialized by settings.load()
       ui.return_to_status();
       KEEPALIVE_STATE(IN_HANDLER);
       ui.goto_screen(menu_touchmi); // Go back to Menu
+
+    #elif defined(TOUCHMI_PROBE_DEPLOY_X)
+      // move to magnet on the right (or predefined X)
+      #if ENABLED(TOUCHMI_POSITION_RIGHT) && TOUCHMI_PROBE_DEPLOY_X > X_MAX_BED
+        TemporaryGlobalEndstopsState unlock_x(false);
+      #endif
+      do_blocking_move_to_x(TOUCHMI_PROBE_DEPLOY_X);
     #else
-      do_blocking_move_to_x(X_MIN_BED);
+      // if not set, move to magnet unlock on the left
+      do_blocking_move_to_x(0);
     #endif
   }
   void run_stow_moves_script() {
-    #if ENABLED(TOUCHMI_POSITION_RIGHT)
-      endstops.enable_globally(false);
-    #endif
+    const float TOUCHMI_RETURN_POSITION[] = { current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS] };
     endstops.enable_z_probe(false);
-    #define TOUCHMI_POSITION_BEFORE_PROBE_Z current_position[Z_AXIS]
-    #define TOUCHMI_POSITION_BEFORE_PROBE_X current_position[X_AXIS]
-    #define TOUCHMI_POSITION_BEFORE_PROBE_Y current_position[Y_AXIS]
-    const float TOUCHMI_RETURN_POSITION[] = { TOUCHMI_POSITION_BEFORE_PROBE_X,TOUCHMI_POSITION_BEFORE_PROBE_Y, TOUCHMI_POSITION_BEFORE_PROBE_Z };
     do_blocking_move_to_z(PROBE_RETRACT_HEIGHT, MMM_TO_MMS(HOMING_FEEDRATE_Z));
     do_blocking_move_to(TOUCHMI_RETURN_POSITION, MMM_TO_MMS(HOMING_FEEDRATE_Z));
   }
