@@ -108,6 +108,7 @@ float zprobe_zoffset; // Initialized by settings.load()
     #if ENABLED(TOUCHMI_MANUAL_DEPLOY)
       extern void menu_touchmi();
 
+      const screenFunc_t prev_screen = ui.currentScreen;
       PGM_P const touchmi_str = PSTR(MSG_MANUAL_DEPLOY_TOUCHMI);
       ui.return_to_status(); // To display the new status message
       ui.set_status_P(touchmi_str, 99);
@@ -120,7 +121,7 @@ float zprobe_zoffset; // Initialized by settings.load()
       ui.reset_status();
       ui.return_to_status();
       KEEPALIVE_STATE(IN_HANDLER);
-      ui.goto_screen(menu_touchmi); // Go back to Menu
+      ui.goto_screen(prev_screen);
 
     #elif defined(TOUCHMI_PROBE_DEPLOY_X)
       // move to magnet on the right (or predefined X)

@@ -1051,6 +1051,9 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
     #if ENABLED(TOUCHMI_MANUAL_DEPLOY) && ENABLED(TOUCHMI_POSITION_RIGHT)
       #error "TouchMI can't be configured automatically and manually at the same time."
     #endif
+    #if Z_MIN_PROBE_ENDSTOP_INVERTING
+      #error "TouchMI requires Z_MIN_PROBE_ENDSTOP_INVERTING to be set to false."
+    #endif
   #endif
 
   /**
