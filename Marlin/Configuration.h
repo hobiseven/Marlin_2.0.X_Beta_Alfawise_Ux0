@@ -929,22 +929,25 @@
 /**
  * Touch-MI
  * A probe deployed by moving the x-axis and activated with a magnet placed on the right or left.
+ * By default, the Magnet is on the left and activeted by a Home.
  *
  * If activation magnet is on the RIGHT enable magnet position with:
- * #define Z_PROBE_POSITION_RIGHT
- *
+ *  #define Z_PROBE_POSITION_RIGHT
+ * 
+ * BABYSTEPPING and BABYSTEP_ZPROBE_OFFSET must be enabled in Configuration_adv.h
  * Z_SAFE_HOMING must be enabled to not home outside the bed.
  * PROBE_RETRACT_HEIGHT need to defined to retract the probe.
  * Z_HOMING_HEIGHT must be defined to a minimum of 10.
  * MIN_PROBE_EDGE must be defined and BOUNDARIES defined (where the probe can reach).
+ * 
  * TOUCHMI_POSITION_RIGHT needs TOUCHMI_PROBE_DEPLOY_X to be defined.
  */
 
 //#define TOUCHMI_PROBE
 
 #if ENABLED(TOUCHMI_PROBE)
-  #define PROBE_RETRACT_HEIGHT  1   // Height at witch the probre retract
-  //#define TOUCHMI_POSITION_RIGHT  // If your Touch-MI is on the right of the Bed
+  #define PROBE_RETRACT_HEIGHT  0.5   // Height at witch the probre retract
+  //#define TOUCHMI_POSITION_RIGHT  // If your magnet is on the right of the Bed
   //#define TOUCHMI_MANUAL_DEPLOY   // For manual deploy
   #undef PROBE_MANUALLY
 #endif

@@ -1054,6 +1054,9 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
     #if Z_MIN_PROBE_ENDSTOP_INVERTING
       #error "TouchMI requires Z_MIN_PROBE_ENDSTOP_INVERTING to be set to false."
     #endif
+    #if !defined(BABYSTEPPING) || !defined(BABYSTEP_ZPROBE_OFFSET)
+      #error "TouchMI requires BABYSTEPPING and BABYSTEP_ZPROBE_OFFSET enabled. Check your Configuration_adv.h settings."
+    #endif
   #endif
 
   /**
