@@ -197,11 +197,7 @@ static void lcd_factory_settings() {
     ui.defer_status_screen();
     MENU_BACK(MSG_CONFIGURATION);
     MENU_ITEM(gcode, MSG_TOUCHMI_INIT, PSTR("M851 Z0\nM500\nG28\nS211 S0\nG1 F200 Z0"));
-    #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
-      MENU_ITEM(submenu, MSG_ZPROBE_ZOFFSET, lcd_babystep_zoffset);
-    #elif HAS_BED_PROBE
-      MENU_ITEM_EDIT(float52, MSG_ZPROBE_ZOFFSET, &zprobe_zoffset, Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX);
-    #endif
+    MENU_ITEM(submenu, MSG_ZPROBE_ZOFFSET, lcd_babystep_zoffset);
     MENU_ITEM(gcode, MSG_TOUCHMI_SAVE, PSTR("M211 S1\nM500\nG1 F200 Z10"));
     MENU_ITEM(gcode, MSG_TOUCHMI_ZTEST, PSTR("G28\nG1 F200 Z0"));
     END_MENU();
