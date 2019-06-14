@@ -104,10 +104,14 @@ float zprobe_zoffset; // Initialized by settings.load()
   }
 
 #elif ENABLED(TOUCHMI_PROBE)
-  void run_deploy_moves_script() {
-    #if ENABLED(TOUCHMI_MANUAL_DEPLOY)
-      extern void menu_touchmi();
 
+  // Move to the magnet to unlock the probe
+  void run_deploy_moves_script() {
+    #ifndef TOUCHMI_PROBE_DEPLOY_X
+      #define TOUCHMI_PROBE_DEPLOY_X 0
+    #endif
+
+    #if ENABLED(TOUCHMI_MANUAL_DEPLOY)
       const screenFunc_t prev_screen = ui.currentScreen;
       PGM_P const touchmi_str = PSTR(MSG_MANUAL_DEPLOY_TOUCHMI);
       ui.return_to_status(); // To display the new status message
@@ -122,18 +126,15 @@ float zprobe_zoffset; // Initialized by settings.load()
       ui.return_to_status();
       KEEPALIVE_STATE(IN_HANDLER);
       ui.goto_screen(prev_screen);
-
-    #elif defined(TOUCHMI_PROBE_DEPLOY_X)
-      // move to magnet on the right (or predefined X)
-      #if ENABLED(TOUCHMI_POSITION_RIGHT) && TOUCHMI_PROBE_DEPLOY_X > X_MAX_BED
-        TemporaryGlobalEndstopsState unlock_x(false);
-      #endif
-      do_blocking_move_to_x(TOUCHMI_PROBE_DEPLOY_X);
-    #else
-      // if not set, move to magnet unlock on the left
-      do_blocking_move_to_x(0);
     #endif
+
+    #if TOUCHMI_PROBE_DEPLOY_X > X_MAX_BED
+      TemporaryGlobalEndstopsState unlock_x(false);
+    #endif
+    do_blocking_move_to_x(TOUCHMI_PROBE_DEPLOY_X);
   }
+
+  // Move down to the bed to stow the probe
   void run_stow_moves_script() {
     const float TOUCHMI_RETURN_POSITION[] = { current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS] };
     endstops.enable_z_probe(false);
@@ -404,17 +405,13 @@ FORCE_INLINE void probe_specific_action(const bool deploy) {
       if (deploy) bltouch.deploy(); else bltouch.stow();
     #endif
 
-  #elif ENABLED(Z_PROBE_ALLEN_KEY)
+  #elif EITHER(TOUCHMI_PROBE, Z_PROBE_ALLEN_KEY)
 
     deploy ? run_deploy_moves_script() : run_stow_moves_script();
 
   #elif ENABLED(RACK_AND_PINION_PROBE)
 
     do_blocking_move_to_x(deploy ? Z_PROBE_DEPLOY_X : Z_PROBE_RETRACT_X);
-
-  #elif ENABLED(TOUCHMI_PROBE)
-
-    deploy ? run_deploy_moves_script() : run_stow_moves_script();
 
   #elif DISABLED(PAUSE_BEFORE_DEPLOY_STOW)
 
