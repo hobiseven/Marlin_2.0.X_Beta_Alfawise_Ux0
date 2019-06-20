@@ -13,7 +13,9 @@
 #define __ASM __asm
 #define __STATIC_INLINE static inline
 
+#ifndef UNUSED
 #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
+#endif
 
 #define FSMC_DMA_DEV        DMA2
 #define FSMC_DMA_CHANNEL    DMA_CH5
