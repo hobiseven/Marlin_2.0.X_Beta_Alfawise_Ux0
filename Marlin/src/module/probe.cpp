@@ -114,18 +114,19 @@ float zprobe_zoffset; // Initialized by settings.load()
     #if ENABLED(TOUCHMI_MANUAL_DEPLOY)
       const screenFunc_t prev_screen = ui.currentScreen;
       PGM_P const touchmi_str = PSTR(MSG_MANUAL_DEPLOY_TOUCHMI);
-      ui.return_to_status(); // To display the new status message
-      ui.set_status_P(touchmi_str, 99);
-      serialprintPGM(touchmi_str);
-      SERIAL_EOL();
+      LCD_MESSAGEPGM(touchmi_str);
+      SERIAL_ECHOLNPGM("Deploy TouchMi probe.");
+      ui.return_to_status();
 
       KEEPALIVE_STATE(PAUSED_FOR_USER);
-      wait_for_user = true;
+      wait_for_user = true; // LCD click or M108 will clear this
+      #if ENABLED(HOST_PROMPT_SUPPORT)
+        host_prompt_do(PROMPT_USER_CONTINUE, PSTR("Deploy TouchMI probe. Confirm or M108 to continue."), PSTR("Continue"));
+      #endif
       while (wait_for_user) idle();
       ui.reset_status();
-      ui.return_to_status();
-      KEEPALIVE_STATE(IN_HANDLER);
       ui.goto_screen(prev_screen);
+      KEEPALIVE_STATE(IN_HANDLER);
     #endif
 
     #if TOUCHMI_PROBE_DEPLOY_X > X_MAX_BED
