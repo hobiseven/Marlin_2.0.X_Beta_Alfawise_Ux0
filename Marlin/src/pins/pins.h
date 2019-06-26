@@ -410,6 +410,8 @@
 
 #elif MB(STM32F1R)
   #include "pins_STM32F1R.h"          // STM32F1                                    env:STM32F1
+#elif MB(LONGER3D_LK)
+  #include "pins_ALFAWISE_UX0.h"      // STM32F1                                    env:alfawise_Ux0
 #elif MB(STM3R_MINI)
   #include "pins_STM3R_MINI.h"        // STM32F1                                    env:STM32F1
 #elif MB(MALYAN_M200)
@@ -422,8 +424,6 @@
   #include "pins_MORPHEUS.h"          // STM32F1                                    env:STM32F1
 #elif MB(MKS_ROBIN)
   #include "pins_MKS_ROBIN.h"         // STM32F1                                    env:mks_robin
-#elif MB(ALFAWISE_UX0)
-  #include "pins_ALFAWISE_UX0.h"      // STM32F1                                    env:alfawise_uX0
 
 //
 // STM32 ARM Cortex-M4F
