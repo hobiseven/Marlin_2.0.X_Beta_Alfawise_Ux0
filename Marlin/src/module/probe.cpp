@@ -109,12 +109,13 @@ float zprobe_zoffset; // Initialized by settings.load()
   void run_deploy_moves_script() {
     #ifndef TOUCHMI_PROBE_DEPLOY_X
       #define TOUCHMI_PROBE_DEPLOY_X 0
+    #elif TOUCHMI_PROBE_DEPLOY_X > X_MAX_BED
+      TemporaryGlobalEndstopsState unlock_x(false);
     #endif
 
     #if ENABLED(TOUCHMI_MANUAL_DEPLOY)
       const screenFunc_t prev_screen = ui.currentScreen;
-      PGM_P const touchmi_str = PSTR(MSG_MANUAL_DEPLOY_TOUCHMI);
-      LCD_MESSAGEPGM(touchmi_str);
+      LCD_MESSAGEPGM(MSG_MANUAL_DEPLOY_TOUCHMI);
       SERIAL_ECHOLNPGM("Deploy TouchMi probe.");
       ui.return_to_status();
 
@@ -127,12 +128,9 @@ float zprobe_zoffset; // Initialized by settings.load()
       ui.reset_status();
       ui.goto_screen(prev_screen);
       KEEPALIVE_STATE(IN_HANDLER);
+    #else
+      do_blocking_move_to_x(TOUCHMI_PROBE_DEPLOY_X);
     #endif
-
-    #if TOUCHMI_PROBE_DEPLOY_X > X_MAX_BED
-      TemporaryGlobalEndstopsState unlock_x(false);
-    #endif
-    do_blocking_move_to_x(TOUCHMI_PROBE_DEPLOY_X);
   }
 
   // Move down to the bed to stow the probe
