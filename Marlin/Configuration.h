@@ -933,27 +933,24 @@
  * By default, the Magnet is on the left and activated by a Home.
  *
  * If activation magnet is on the RIGHT define magnet position with:
- * #define Z_PROBE_POSITION_RIGHT
+ * #define TOUCH_MI_POSITION_RIGHT
  *
  * BABYSTEPPING and BABYSTEP_ZPROBE_OFFSET must be enabled in Configuration_adv.h
  * Z_SAFE_HOMING must be enabled to avoid a deploy outside the bed.
- * PROBE_RETRACT_HEIGHT need to be defined to retract the probe.
+ * TOUCH_MI_RETRACT_Z need to be defined to retract the probe.
  * Z_HOMING_HEIGHT must be defined to a minimum of 10.
- * MIN_PROBE_EDGE must be defined and BOUNDARIES defined (where the probe can reach).
  *
- * TOUCHMI_POSITION_RIGHT needs TOUCHMI_PROBE_DEPLOY_X to be defined.
+ * TOUCH_MI_POSITION_RIGHT needs TOUCH_MI_DEPLOY_XPOS to be defined.
  */
-
-//#define TOUCHMI_PROBE
-
-#if ENABLED(TOUCHMI_PROBE)
-  #define PROBE_RETRACT_HEIGHT 0.5  // Height at which the probe retract
-  //#define TOUCHMI_POSITION_RIGHT  // If your magnet is on the right of the Bed
-  //#define TOUCHMI_MANUAL_DEPLOY   // For manual deploy
+//#define TOUCH_MI_PROBE
+#if ENABLED(TOUCH_MI_PROBE)
+  #define TOUCH_MI_RETRACT_Z 0.5  // Height at which the probe retract
+  //#define TOUCH_MI_POSITION_RIGHT // If your magnet is on the right of the Bed
+  //#define TOUCH_MI_MANUAL_DEPLOY  // For manual deploy (without magnet on X)
   #undef PROBE_MANUALLY
 #endif
-#if ENABLED(TOUCHMI_POSITION_RIGHT)
-  #define TOUCHMI_PROBE_DEPLOY_X X_MAX_BED // X_MAX_BED or (X_MAX_BED + X) if magnet is outside the BED.
+#if ENABLED(TOUCH_MI_POSITION_RIGHT)
+  #define TOUCH_MI_DEPLOY_XPOS (X_MAX_BED + 1) // X_MAX_BED or (X_MAX_BED + X) if magnet is outside the BED.
 #endif
 
 //

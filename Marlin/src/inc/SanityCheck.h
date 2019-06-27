@@ -980,7 +980,7 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
   + ENABLED(Z_PROBE_ALLEN_KEY) \
   + ENABLED(Z_PROBE_SLED) \
   + ENABLED(RACK_AND_PINION_PROBE) \
-  + ENABLED(TOUCHMI_PROBE)
+  + ENABLED(TOUCH_MI_PROBE)
   #error "Please enable only one probe option: PROBE_MANUALLY, FIX_MOUNTED_PROBE, BLTOUCH, SOLENOID_PROBE, Z_PROBE_ALLEN_KEY, Z_PROBE_SLED, or Z Servo."
 #endif
 
@@ -1035,20 +1035,20 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
     #error "RACK_AND_PINION_PROBE requires Z_PROBE_DEPLOY_X and Z_PROBE_RETRACT_X."
   #endif
 
-  #if ENABLED(TOUCHMI_PROBE)
-    #if ((MIN_PROBE_EDGE == 0) || !defined(Z_SAFE_HOMING) || !defined(PROBE_RETRACT_HEIGHT))
-      #error "TOUCHMI_PROBE requires Z_SAFE_HOMING, MIN_PROBE_EDGE, and PROBE_RETRACT_HEIGHT"
+  #if ENABLED(TOUCH_MI_PROBE)
+    #if (!defined(Z_SAFE_HOMING) || !defined(TOUCH_MI_RETRACT_Z))
+      #error "TOUCH_MI_PROBE requires Z_SAFE_HOMING and TOUCH_MI_RETRACT_Z"
     #endif
-    #if ENABLED(TOUCHMI_POSITION_RIGHT) && !defined(TOUCHMI_PROBE_DEPLOY_X)
-      #error "TOUCHMI_POSITION_RIGHT need TOUCHMI_PROBE_DEPLOY_X to be defined."
+    #if ENABLED(TOUCH_MI_POSITION_RIGHT) && !defined(TOUCH_MI_DEPLOY_XPOS)
+      #error "TOUCH_MI_POSITION_RIGHT need TOUCH_MI_DEPLOY_XPOS to be defined."
     #endif
     #ifdef Z_AFTER_PROBING
-     #error "TOUCHMI_PROBE do not need Z_AFTER_PROBING to stow the probe."
+     #error "TOUCH_MI_PROBE do not need Z_AFTER_PROBING to stow the probe."
     #endif
     #if Z_HOMING_HEIGHT < 10
       #error "Z_HOMING_HEIGHT too low, please set to minimum 10"
     #endif
-    #if ENABLED(TOUCHMI_MANUAL_DEPLOY) && ENABLED(TOUCHMI_POSITION_RIGHT)
+    #if ENABLED(TOUCH_MI_MANUAL_DEPLOY) && ENABLED(TOUCH_MI_POSITION_RIGHT)
       #error "TouchMI can't be configured automatically and manually at the same time."
     #endif
     #if Z_MIN_PROBE_ENDSTOP_INVERTING

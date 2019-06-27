@@ -191,7 +191,7 @@ static void lcd_factory_settings() {
 
 #endif
 
-#if ENABLED(TOUCHMI_PROBE)
+#if ENABLED(TOUCH_MI_PROBE)
   void menu_touchmi() {
     START_MENU();
     ui.defer_status_screen();
@@ -329,7 +329,7 @@ void menu_configuration() {
       MENU_ITEM(submenu, MSG_BLTOUCH, menu_bltouch);
     #endif
 
-    #if ENABLED(TOUCHMI_PROBE)
+    #if ENABLED(TOUCH_MI_PROBE)
       MENU_ITEM(submenu, MSG_TOUCHMI_PROBE, menu_touchmi);
     #endif
   }
