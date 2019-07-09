@@ -1,3 +1,21 @@
+/**
+ * Marlin 3D Printer Firmware
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 #ifdef __STM32F1__
 
 #include "../../inc/MarlinConfig.h"
@@ -16,15 +34,16 @@ extern int8_t encoderDiff;
 
 void touch_swSPI_init(void)
 {
-  pinMode(TOUCH_INT, INPUT); // Pendrive interrupt pin, used as pooling in IStouched
+  pinMode(TOUCH_INT, INPUT); // Pendrive interrupt pin, used as polling in getInTouch()
   pinMode(TOUCH_CS, OUTPUT);
   pinMode(TOUCH_SCK, OUTPUT);
   pinMode(TOUCH_MOSI, OUTPUT);
   pinMode(TOUCH_MISO, INPUT);
 
-  digitalWrite (TOUCH_SCK,0);
-  digitalWrite (TOUCH_CS, 1);
-  getInTouch(XPT2046_X); // this is a dummy read needed to enable pendrive status pin
+  OUT_WRITE(TOUCH_SCK,0);
+  OUT_WRITE(TOUCH_CS, 1);
+  // This is a dummy read needed to enable pendrive status pin
+  getInTouch(XPT2046_X);
 }
 
 uint8_t xpt2046_read_buttons()
@@ -78,19 +97,18 @@ uint16_t getInTouch(uint8_t coordinate)
   for (uint16_t i = 0; i < 3 ; i++)
   {
     for (uint16_t j=0x80; j>0x00; j>>=1) {
-      OUT_WRITE(TOUCH_SCK,0);
+      OUT_WRITE(TOUCH_SCK, 0);
       OUT_WRITE(TOUCH_MOSI,(bool)(coordinate & j));
       OUT_WRITE(TOUCH_SCK, 1);
     }
 
     data[i] = 0;
     for (uint32_t j=0x8000; j!=0x0000; j>>=1) {
-      OUT_WRITE(TOUCH_SCK,0);
+      OUT_WRITE(TOUCH_SCK, 0);
       if (digitalRead(TOUCH_MISO)) data[i]=(data[i] | j);
       OUT_WRITE(TOUCH_SCK, 1);
     }
-
-    OUT_WRITE(TOUCH_SCK,0);
+    OUT_WRITE(TOUCH_SCK, 0);
     data[i]>>=4;
   }
 
