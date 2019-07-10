@@ -34,11 +34,9 @@ extern int8_t encoderDiff;
 
 void touch_swSPI_init(void)
 {
-  pinMode(TOUCH_INT, INPUT); // Pendrive interrupt pin, used as polling in getInTouch()
-  pinMode(TOUCH_CS, OUTPUT);
-  pinMode(TOUCH_SCK, OUTPUT);
-  pinMode(TOUCH_MOSI, OUTPUT);
-  pinMode(TOUCH_MISO, INPUT);
+  SET_INPUT(TOUCH_INT); // Pendrive interrupt pin, used as polling in getInTouch()
+  SET_INPUT(TOUCH_MISO);
+  SET_OUTPUT(TOUCH_MOSI);
 
   OUT_WRITE(TOUCH_SCK,0);
   OUT_WRITE(TOUCH_CS, 1);
@@ -73,10 +71,10 @@ uint8_t xpt2046_read_buttons()
 
   // We rely on XPT2046 compatible mode to ADS7843, hence no Z1 and Z2 measurements possible.
 
-  if (digitalRead(TOUCH_INT)) { return 0; } // if TOUCH_INT is high, no fingers are pressing on the touch screen > exit
+  if (READ(TOUCH_INT)) { return 0; } // if TOUCH_INT is high, no fingers are pressing on the touch screen > exit
   x = (uint16_t)((((uint32_t)(getInTouch(XPT2046_X))) * tsoffsets[0]) >> 16) + tsoffsets[1];
   y = (uint16_t)((((uint32_t)(getInTouch(XPT2046_Y))) * tsoffsets[2]) >> 16) + tsoffsets[3];
-  if (digitalRead(TOUCH_INT)) { return 0; } // The fingers still need to be on the TS to have a valid read.
+  if (READ(TOUCH_INT)) { return 0; } // The fingers still need to be on the TS to have a valid read.
 
   if (y < 185 || y > 224) { return 0; }
   if (x >  20 && x <  99) encoderDiff = - ENCODER_STEPS_PER_MENU_ITEM * ENCODER_PULSES_PER_STEP;
@@ -92,27 +90,27 @@ uint16_t getInTouch(uint8_t coordinate)
 
   coordinate |= XPT2046_CONTROL | XPT2046_DFR_MODE;
 
-  OUT_WRITE(TOUCH_CS, 0);
+  OUT_WRITE(TOUCH_CS, LOW);
 
   for (uint16_t i = 0; i < 3 ; i++)
   {
     for (uint16_t j=0x80; j>0x00; j>>=1) {
-      OUT_WRITE(TOUCH_SCK, 0);
-      OUT_WRITE(TOUCH_MOSI,(bool)(coordinate & j));
-      OUT_WRITE(TOUCH_SCK, 1);
+      WRITE(TOUCH_SCK, LOW);
+      WRITE(TOUCH_MOSI, bool(coordinate & j));
+      WRITE(TOUCH_SCK, HIGH);
     }
 
     data[i] = 0;
     for (uint32_t j=0x8000; j!=0x0000; j>>=1) {
-      OUT_WRITE(TOUCH_SCK, 0);
-      if (digitalRead(TOUCH_MISO)) data[i]=(data[i] | j);
-      OUT_WRITE(TOUCH_SCK, 1);
+      WRITE(TOUCH_SCK, LOW);
+      if (READ(TOUCH_MISO)) data[i] = (data[i] | j);
+      WRITE(TOUCH_SCK, HIGH);
     }
-    OUT_WRITE(TOUCH_SCK, 0);
-    data[i]>>=4;
+    WRITE(TOUCH_SCK, LOW);
+    data[i] >>= 4;
   }
 
-  OUT_WRITE(TOUCH_CS, 1);
+  WRITE(TOUCH_CS, HIGH);
 
   delta[0] = data[0] > data[1] ? data[0] - data[1] : data[1] - data[0];
   delta[1] = data[0] > data[2] ? data[0] - data[2] : data[2] - data[0];
