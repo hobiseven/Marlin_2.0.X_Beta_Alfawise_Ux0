@@ -1057,6 +1057,9 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
     #if !defined(BABYSTEPPING) || !defined(BABYSTEP_ZPROBE_OFFSET)
       #error "TouchMI requires BABYSTEPPING and BABYSTEP_ZPROBE_OFFSET enabled. Check your Configuration_adv.h settings."
     #endif
+    #if DISABLED(TOUCH_MI_POSITION_RIGHT) && DISABLED(TOUCH_MI_MANUAL_DEPLOY) && (X_MIN_POS > -5)
+      #error "TouchMI in left position need X_MIN_POS to be set to -5 minimum to print safely."
+    #endif
   #endif
 
   /**
