@@ -411,7 +411,7 @@
 #elif MB(STM32F1R)
   #include "pins_STM32F1R.h"          // STM32F1                                    env:STM32F1
 #elif MB(LONGER3D_LK)
-  #include "pins_ALFAWISE_UX0.h"      // STM32F1                                    env:alfawise_Ux0
+  #include "stm32/pins_LONGER3D_LK.h" // STM32F1                                    env:alfawise_U20
 #elif MB(STM3R_MINI)
   #include "pins_STM3R_MINI.h"        // STM32F1                                    env:STM32F1
 #elif MB(MALYAN_M200)
