@@ -141,14 +141,16 @@
 #define E2END              0x7FF // EEPROM end address (reserve 2kB on sd/sram, real spi one is 8MB/64Mbits)
 
 /*
-//#define SPI_EEPROM          // If commented this will create a file on the SD card as a replacement
+#define SPI_EEPROM               // If commented this will create a file on the SD card as a replacement
 #define SPI_CHAN_EEPROM1   1
-#define SPI_EEPROM1_CS     PC5 // pin 34
-
-//#define EEPROM_SCK         BOARD_SPI1_SCK_PIN  // PA5 pin 30
-//#define EEPROM_MISO        BOARD_SPI1_MISO_PIN // PA6 pin 31
-//#define EEPROM_MOSI        BOARD_SPI1_MOSI_PIN // PA7 pin 32
-
-#define SPI_CHAN_DAC       2
-#define DAC0_SYNC          PA4 // pin 29 but seems not used, error in schematics ?
+#define SPI_EEPROM1_CS     PC5   // pin 34
+#define EEPROM_PAGE_SIZE   0x1000u
+//#define EEPROM_SCK  BOARD_SPI1_SCK_PIN   // PA5 pin 30
+//#define EEPROM_MISO BOARD_SPI1_MISO_PIN  // PA6 pin 31
+//#define EEPROM_MOSI BOARD_SPI1_MOSI_PIN  // PA7 pin 32
 */
+
+// EEPROM stored in SoC Flash (framework-arduinoststm32-maple/STM32F1/libraries/EEPROM/EEPROM.h)
+//#define FLASH_EEPROM_EMULATION
+//#define EEPROM_PAGE_SIZE     uint16_t(0x800)
+//#define EEPROM_START_ADDRESS uint32_t(0x8000000 + 512 * 1024 - 2 * EEPROM_PAGE_SIZE)

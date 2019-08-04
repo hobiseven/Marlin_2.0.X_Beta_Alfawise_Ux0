@@ -50,7 +50,7 @@ static char HAL_STM32F1_eeprom_content[HAL_STM32F1_EEPROM_SIZE];
 
     SdFile file, root = card.getroot();
     if (!file.open(&root, EEPROM_FILENAME, O_RDONLY))
-      return false;
+      return true; // false aborts the save
 
     int16_t bytes_read = file.read(HAL_STM32F1_eeprom_content, HAL_STM32F1_EEPROM_SIZE);
     if (bytes_read < 0) return false;
