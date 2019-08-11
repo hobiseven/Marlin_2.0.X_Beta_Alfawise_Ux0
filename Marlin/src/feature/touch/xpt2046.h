@@ -2,9 +2,6 @@
  * Marlin 3D Printer Firmware
  * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
- * Based on Sprinter and grbl.
- * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,30 +18,36 @@
  */
 #pragma once
 
-//
-// Prefix header for all Marlin sources
-//
+#include <stdint.h>
 
-#include "MarlinConfigPre.h"
+// Relies on XPT2046-compatible mode of ADS7843,
+// hence no Z1 / Z2 measurements are possible.
 
-#include HAL_PATH(../HAL, HAL.h)
+#define XPT2046_DFR_MODE 0x00
+#define XPT2046_SER_MODE 0x04
+#define XPT2046_CONTROL  0x80
 
-#include "../pins/pins.h"
+enum XPTCoordinate : uint8_t {
+  XPT2046_X  = 0x10,
+  XPT2046_Y  = 0x50,
+  XPT2046_Z1 = 0x30,
+  XPT2046_Z2 = 0x40
+};
 
-#include HAL_PATH(../HAL, spi_pins.h)
-
-#if defined(__AVR__) && !defined(USBCON)
-  #define HardwareSerial_h // trick to disable the standard HWserial
+#ifndef XPT2046_Z1_THRESHOLD
+  #define XPT2046_Z1_THRESHOLD 10
 #endif
 
-#include "Conditionals_post.h"
-#include "SanityCheck.h"
+class XPT2046 {
+public:
+  static void init(void);
+  static uint8_t read_buttons();
+  bool getTouchPoint(uint16_t &x, uint16_t &y);
+  static bool isTouched();
+  inline void waitForRelease(void) { while (isTouched()) {}; }
+  inline void waitForTouch(uint16_t &x, uint16_t &y) { while(!getTouchPoint(x, y)) {;} }
+private:
+  static uint16_t getInTouch(const XPTCoordinate coordinate);
+};
 
-#include HAL_PATH(../HAL, SanityCheck.h)
-
-// Include all core headers
-#include "../core/enum.h"
-#include "../core/language.h"
-#include "../core/utility.h"
-#include "../core/serial.h"
-#include "../core/minmax.h"
+extern XPT2046 touch;

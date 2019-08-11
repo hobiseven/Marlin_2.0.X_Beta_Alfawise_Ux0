@@ -1,7 +1,7 @@
 /**
  * Marlin 3D Printer Firmware
  *
- * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  * Copyright (c) 2016 Bob Cousins bobcousins42@googlemail.com
  * Copyright (c) 2015-2016 Nico Tonnhofer wurstnase.reprap@gmail.com
  *
@@ -26,61 +26,17 @@
 
 #ifdef __STM32F1__
 
-// --------------------------------------------------------------------------
-// Includes
-// --------------------------------------------------------------------------
-
 #include "HAL.h"
 
 #include "HAL_timers_STM32F1.h"
 
-// --------------------------------------------------------------------------
-// Externals
-// --------------------------------------------------------------------------
-
-// --------------------------------------------------------------------------
+// ------------------------
 // Local defines
-// --------------------------------------------------------------------------
+// ------------------------
 
-#define NUM_HARDWARE_TIMERS 2
-
-//#define PRESCALER 1
-// --------------------------------------------------------------------------
-// Types
-// --------------------------------------------------------------------------
-
-
-// --------------------------------------------------------------------------
-// Public Variables
-// --------------------------------------------------------------------------
-
-// --------------------------------------------------------------------------
-// Private Variables
-// --------------------------------------------------------------------------
-/* VGPV
-const tTimerConfig TimerConfig [NUM_HARDWARE_TIMERS] = {
-  { TC0, 0, TC0_IRQn, 0},  // 0 - [servo timer5]
-  { TC0, 1, TC1_IRQn, 0},  // 1
-  { TC0, 2, TC2_IRQn, 0},  // 2
-  { TC1, 0, TC3_IRQn, 2},  // 3 - stepper
-  { TC1, 1, TC4_IRQn, 15}, // 4 - temperature
-  { TC1, 2, TC5_IRQn, 0},  // 5 - [servo timer3]
-  { TC2, 0, TC6_IRQn, 0},  // 6
-  { TC2, 1, TC7_IRQn, 0},  // 7
-  { TC2, 2, TC8_IRQn, 0},  // 8
-};
-*/
-// --------------------------------------------------------------------------
-// Function prototypes
-// --------------------------------------------------------------------------
-
-// --------------------------------------------------------------------------
-// Private functions
-// --------------------------------------------------------------------------
-
-// --------------------------------------------------------------------------
+// ------------------------
 // Public functions
-// --------------------------------------------------------------------------
+// ------------------------
 
 /**
  * Timer_clock1: Prescaler   2 ->  36    MHz
@@ -109,7 +65,6 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
       /**
        * This should never happen. Add a Sanitycheck for timer number.
        * Should be a general timer since basic timers have no CC channels.
-       * Advanced timers should be skipped if possible too, and are not listed above.
        */
       break;
   }
@@ -214,7 +169,7 @@ timer_dev* get_timer_dev(int number) {
       case 12: return &timer12;
     #endif
     #if STM32_HAVE_TIMER(13)
-      case 13: return &timer14;
+      case 13: return &timer13;
     #endif
     #if STM32_HAVE_TIMER(14)
       case 14: return &timer14;

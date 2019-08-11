@@ -38,20 +38,20 @@
   /**
    * Marlin release version identifier
    */
-  #define SHORT_BUILD_VERSION "bugfix-2.0.x"
+  #define SHORT_BUILD_VERSION "2.0.x for Alfawise"
 
   /**
    * Verbose version identifier which should contain a reference to the location
    * from where the binary was downloaded or the source code was compiled.
    */
-  #define DETAILED_BUILD_VERSION SHORT_BUILD_VERSION " + JMZ52 & Hobi code"
+  #define DETAILED_BUILD_VERSION SHORT_BUILD_VERSION " (from Hobi git)"
 
   /**
    * The STRING_DISTRIBUTION_DATE represents when the binary file was built,
    * here we define this default string as the date where the latest release
    * version was tagged.
    */
-  #define STRING_DISTRIBUTION_DATE "2019-05-17"
+  #define STRING_DISTRIBUTION_DATE "2019-08-11"
 
   /**
    * Required minimum Configuration.h and Configuration_adv.h file versions.

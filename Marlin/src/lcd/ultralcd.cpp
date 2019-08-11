@@ -95,10 +95,10 @@
   #if HAS_SLOW_BUTTONS
     volatile uint8_t MarlinUI::slow_buttons;
   #endif
-  #if defined(TOUCH_BUTTONS)
-    #include "xpt2046.h"
+  #if ENABLED(TOUCH_BUTTONS)
+    #include "../feature/touch/xpt2046.h"
     volatile uint8_t MarlinUI::touch_buttons;
-    uint8_t MarlinUI::read_touch_buttons() { return xpt2046_read_buttons(); }
+    uint8_t MarlinUI::read_touch_buttons() { return touch.read_buttons(); }
   #endif
 #endif
 
@@ -292,7 +292,7 @@ void MarlinUI::init() {
   #if HAS_ENCODER_ACTION && HAS_SLOW_BUTTONS
     slow_buttons = 0;
   #endif
-  #if HAS_ENCODER_ACTION && defined(TOUCH_BUTTONS)
+  #if HAS_ENCODER_ACTION && ENABLED(TOUCH_BUTTONS)
     touch_buttons = 0;
   #endif
 
@@ -543,7 +543,7 @@ void MarlinUI::kill_screen(PGM_P lcd_msg) {
 }
 
 void MarlinUI::quick_feedback(const bool clear_buttons/*=true*/) {
-  #if HAS_LCD_MENU && !defined(TOUCH_BUTTONS)
+  #if HAS_LCD_MENU
     refresh();
   #endif
 
@@ -704,6 +704,35 @@ void MarlinUI::update() {
 
     // If the action button is pressed...
     static bool wait_for_unclick; // = 0
+    #if ENABLED(TOUCH_BUTTONS)
+      if (touch_buttons) {
+        if (!wait_for_unclick && (buttons & EN_C)) {    // If not waiting for a debounce release:
+          wait_for_unclick = true;                      //  - Set debounce flag to ignore continous clicks
+          lcd_clicked = !wait_for_user && !no_reentry;  //  - Keep the click if not waiting for a user-click
+          wait_for_user = false;                        //  - Any click clears wait for user
+          quick_feedback();                             //  - Always make a click sound
+        }
+        else if (buttons & (EN_A | EN_B)) {             // Ignore the encoder if clicked, to prevent "slippage"
+          const millis_t ms = millis();
+          if (ELAPSED(ms, next_button_update_ms)) {
+            next_button_update_ms = ms + 50;
+            encoderDiff = (ENCODER_STEPS_PER_MENU_ITEM) * (ENCODER_PULSES_PER_STEP);
+            if (buttons & EN_A) encoderDiff *= -1;
+            if (!wait_for_unclick) {
+              next_button_update_ms += 250;
+              #if HAS_BUZZER
+                buzz(LCD_FEEDBACK_FREQUENCY_DURATION_MS, LCD_FEEDBACK_FREQUENCY_HZ);
+              #endif
+              wait_for_unclick = true;                  //  - Set debounce flag to ignore continous clicks
+            }
+          }
+        }
+      }
+      else
+    #endif //TOUCH_BUTTONS
+    //
+    // Integrated LCD click handling via button_pressed()
+    //
     if (!external_control && button_pressed()) {
       if (!wait_for_unclick) {                        // If not waiting for a debounce release:
         wait_for_unclick = true;                      //  - Set debounce flag to ignore continous clicks
@@ -765,7 +794,7 @@ void MarlinUI::update() {
     next_lcd_update_ms = ms + LCD_UPDATE_INTERVAL;
     #if ENABLED(TOUCH_BUTTONS)
       if (on_status_screen())
-        next_lcd_update_ms += LCD_UPDATE_INTERVAL*2;
+        next_lcd_update_ms += LCD_UPDATE_INTERVAL * 2;
     #endif
 
     #if ENABLED(LCD_HAS_STATUS_INDICATORS)
@@ -778,7 +807,7 @@ void MarlinUI::update() {
         slow_buttons = read_slow_buttons(); // Buttons that take too long to read in interrupt context
       #endif
 
-      #if defined(TOUCH_BUTTONS)
+      #if ENABLED(TOUCH_BUTTONS)
         touch_buttons = read_touch_buttons();
       #endif
 
@@ -1123,7 +1152,7 @@ void MarlinUI::update() {
           #if HAS_SLOW_BUTTONS
             | slow_buttons
           #endif
-          #if defined(TOUCH_BUTTONS)
+          #if ENABLED(TOUCH_BUTTONS)
             | touch_buttons
           #endif
         ;

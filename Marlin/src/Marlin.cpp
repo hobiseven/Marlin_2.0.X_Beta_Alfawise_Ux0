@@ -58,7 +58,7 @@
 #include "gcode/queue.h"
 
 #if ENABLED(TOUCH_BUTTONS)
-  #include "xpt2046.h"
+  #include "feature/touch/xpt2046.h"
 #endif
 
 #if ENABLED(HOST_ACTION_COMMANDS)
@@ -962,7 +962,7 @@ void setup() {
   (void)settings.load();
 
   #if ENABLED(TOUCH_BUTTONS)
-    touch_swSPI_init();
+    touch.init();
   #endif
 
   #if HAS_M206_COMMAND

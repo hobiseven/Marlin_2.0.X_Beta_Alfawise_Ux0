@@ -57,9 +57,9 @@
   #endif
 
   #if ENABLED(TOUCH_BUTTONS)
-  #define LCD_UPDATE_INTERVAL 50
+    #define LCD_UPDATE_INTERVAL 50
   #else
-  #define LCD_UPDATE_INTERVAL 100
+    #define LCD_UPDATE_INTERVAL 100
   #endif
 
   #if HAS_LCD_MENU
@@ -151,7 +151,7 @@
 
   #define BUTTON_PRESSED(BN) !READ(BTN_## BN)
 
-  #if BUTTON_EXISTS(ENC)
+  #if BUTTON_EXISTS(ENC) || ENABLED(TOUCH_BUTTONS)
     #define BLEN_C 2
     #define EN_C _BV(BLEN_C)
   #endif

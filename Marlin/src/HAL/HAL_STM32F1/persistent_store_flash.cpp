@@ -1,7 +1,7 @@
 /**
  * Marlin 3D Printer Firmware
  *
- * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  * Copyright (c) 2016 Bob Cousins bobcousins42@googlemail.com
  * Copyright (c) 2015-2016 Nico Tonnhofer wurstnase.reprap@gmail.com
  * Copyright (c) 2016 Victor Perez victor_pv@hotmail.com
@@ -54,7 +54,7 @@ bool PersistentStore::access_finish() {
   return true;
 }
 
-bool PersistentStore::write_data(int &pos, const uint8_t *value, const size_t size, uint16_t *crc) {
+bool PersistentStore::write_data(int &pos, const uint8_t *value, size_t size, uint16_t *crc) {
   FLASH_Status status;
 
   if (firstWrite) {
@@ -66,7 +66,7 @@ bool PersistentStore::write_data(int &pos, const uint8_t *value, const size_t si
     firstWrite = false;
   }
 
-  for (size_t i=0; i<size; i++) {
+  for (size_t i = 0; i < size; i++) {
     if (FLASH_ProgramHalfWord(EEPROM_PAGE0_BASE + (pos + i) * 2, value[i]) != FLASH_COMPLETE)
       return true;
   }
@@ -77,7 +77,7 @@ bool PersistentStore::write_data(int &pos, const uint8_t *value, const size_t si
 }
 
 bool PersistentStore::read_data(int &pos, uint8_t* value, const size_t size, uint16_t *crc, const bool writing/*=true*/) {
-  for (size_t i=0; i<size; i++) {
+  for (size_t i = 0; i < size; i++) {
     uint8_t v = *(uint16_t *)(EEPROM_PAGE0_BASE + (pos + i) * 2);
     if (writing) value[i] = v;
     crc16(crc, &v, 1);
@@ -86,7 +86,7 @@ bool PersistentStore::read_data(int &pos, uint8_t* value, const size_t size, uin
   return false;
 }
 
-size_t PersistentStore::capacity() { return size_t(E2END+1); }
+size_t PersistentStore::capacity() { return size_t(E2END + 1); }
 
-#endif // EEPROM_SETTINGS && FLASH_EEPROM_EMULATION
+#endif // EEPROM_SETTINGS && EEPROM FLASH
 #endif // __STM32F1__

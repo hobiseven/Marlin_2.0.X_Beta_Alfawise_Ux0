@@ -1,7 +1,7 @@
 /**
  * Marlin 3D Printer Firmware
  *
- * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  * Copyright (c) 2016 Bob Cousins bobcousins42@googlemail.com
  * Copyright (c) 2017 Victor Perez
  *
@@ -25,16 +25,12 @@
  * HAL for stm32duino.com based on Libmaple and compatible (STM32F1)
  */
 
-// --------------------------------------------------------------------------
-// Includes
-// --------------------------------------------------------------------------
-
 #include <stdint.h>
 #include <libmaple/timer.h>
 
-// --------------------------------------------------------------------------
+// ------------------------
 // Defines
-// --------------------------------------------------------------------------
+// ------------------------
 
 /**
  * TODO: Check and confirm what timer we will use for each Temps and stepper driving.
@@ -55,8 +51,10 @@ typedef uint16_t hal_timer_t;
 #else
   #define STEP_TIMER_NUM 5 // for other boards, five is fine.
 #endif
-#define TEMP_TIMER_NUM 2  // index of timer to use for temperature
+#define TEMP_TIMER_NUM 2    // index of timer to use for temperature
+//#define TEMP_TIMER_NUM 4  // 2->4, Timer 2 for Stepper Current PWM
 #define PULSE_TIMER_NUM STEP_TIMER_NUM
+#define SERVO0_TIMER_NUM 1  // SERVO0 or BLTOUCH
 
 #define STEP_TIMER_IRQ_PRIO 1
 #define TEMP_TIMER_IRQ_PRIO 2
@@ -94,21 +92,16 @@ timer_dev* get_timer_dev(int number);
 extern "C" void tempTC_Handler(void);
 extern "C" void stepTC_Handler(void);
 
-// --------------------------------------------------------------------------
-// Types
-// --------------------------------------------------------------------------
-
-
-// --------------------------------------------------------------------------
+// ------------------------
 // Public Variables
-// --------------------------------------------------------------------------
-/*
-static HardwareTimer StepperTimer(STEP_TIMER_NUM);
-static HardwareTimer TempTimer(TEMP_TIMER_NUM);
-*/
-// --------------------------------------------------------------------------
+// ------------------------
+
+//static HardwareTimer StepperTimer(STEP_TIMER_NUM);
+//static HardwareTimer TempTimer(TEMP_TIMER_NUM);
+
+// ------------------------
 // Public functions
-// --------------------------------------------------------------------------
+// ------------------------
 
 void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency);
 void HAL_timer_enable_interrupt(const uint8_t timer_num);
@@ -129,13 +122,13 @@ bool HAL_timer_interrupt_enabled(const uint8_t timer_num);
 FORCE_INLINE static void HAL_timer_set_compare(const uint8_t timer_num, const hal_timer_t compare) {
   switch (timer_num) {
   case STEP_TIMER_NUM:
-    // NOTE: WE set ARPE = O, which means the Auto reload register is not preloaded
+    // NOTE: WE have set ARPE = 0, which means the Auto reload register is not preloaded
     // and there is no need to use any compare, as in the timer mode used, setting ARR to the compare value
     // will result in exactly the same effect, ie trigerring an interrupt, and on top, set counter to 0
     timer_set_reload(STEP_TIMER_DEV, compare); // We reload direct ARR as needed during counting up
     break;
   case TEMP_TIMER_NUM:
-    timer_set_compare(TEMP_TIMER_DEV, TEMP_TIMER_CHAN, compare); // Might need to check TEMP timer settings!
+    timer_set_compare(TEMP_TIMER_DEV, TEMP_TIMER_CHAN, compare);
     break;
   }
 }
@@ -167,10 +160,10 @@ FORCE_INLINE static void HAL_timer_isr_prologue(const uint8_t timer_num) {
 
 #define HAL_timer_isr_epilogue(TIMER_NUM)
 
-// No command is available in timers.cpp to turn off ARPE bit, which is turned on by default in libmaple.
-// Needed here to be sure ARPE=0 for stepper timer
+// No command is available in framework to turn off ARPE bit, which is turned on by default in libmaple.
+// Needed here to reset ARPE=0 for stepper timer
 FORCE_INLINE static void timer_no_ARR_preload_ARPE(timer_dev *dev) {
-  *bb_perip(&(dev->regs).bas->CR1,TIMER_CR1_ARPE_BIT) = 0;
+  bb_peri_set_bit(&(dev->regs).gen->CR1, TIMER_CR1_ARPE_BIT, 0);
 }
 
 #define TIMER_OC_NO_PRELOAD 0 // Need to disable preload also on compare registers.
