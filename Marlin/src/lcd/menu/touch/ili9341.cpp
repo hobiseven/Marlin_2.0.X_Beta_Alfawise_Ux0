@@ -1,12 +1,32 @@
+/**
+ * Marlin 3D Printer Firmware
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "../../../inc/MarlinConfig.h"
 
-#if defined(__STM32F1__) && ENABLED(TOUCH_CALIBRATION)
+#if ENABLED(TOUCH_CALIBRATION)
 
 #include "ili9341.h"
-
 #include "fsmc.h"
 
-void ILI9341_Init(void) {
+#define LCD_Delay(ms) delay(ms)
+
+void ILI9341_Init() {
   TOUCH_LCD_IO_Init();
 
   /* Sleep In Command */
@@ -45,7 +65,7 @@ void ILI9341_Init(void) {
   LCD_IO_WriteData(0x86);
 
   /* Frame Rate Control in normal mode */
-  LCD_IO_WriteReg(ILI9341_FR_CTRL);
+  LCD_IO_WriteReg(ILI9341_FRMCTRL);
   LCD_IO_WriteData(0x00);
   LCD_IO_WriteData(0x18);
 
@@ -55,7 +75,7 @@ void ILI9341_Init(void) {
   LCD_IO_WriteReg(ILI9341_POWER_CTRL2);
   LCD_IO_WriteData(0x10);
 
- /* Sleep Out Command */
+  /* Sleep Out Command */
   LCD_IO_WriteReg(ILI9341_SLEEP_OUT);
   /* Wait for 120ms */
   LCD_Delay(120);
@@ -64,7 +84,7 @@ void ILI9341_Init(void) {
   ILI9341_DisplayOn();
 }
 
-void ILI9341_DisplayOn(void) {
+void ILI9341_DisplayOn() {
   /* Display ON command */
   LCD_IO_WriteReg(ILI9341_DISPLAY_ON);
 
@@ -72,7 +92,7 @@ void ILI9341_DisplayOn(void) {
   LCD_IO_WriteReg(ILI9341_SLEEP_OUT);
 }
 
-void ILI9341_WriteRam(void) {
+void ILI9341_WriteRam() {
   LCD_IO_WriteReg(ILI9341_WRITE_RAM);
 }
 

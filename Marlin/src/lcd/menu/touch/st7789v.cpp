@@ -1,11 +1,32 @@
+/**
+ * Marlin 3D Printer Firmware
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "../../../inc/MarlinConfig.h"
 
-#if defined(__STM32F1__) && ENABLED(TOUCH_CALIBRATION)
+#if ENABLED(TOUCH_CALIBRATION)
 
 #include "st7789v.h"
 #include "fsmc.h"
 
-void st7789v_Init(void) {
+#define LCD_Delay(ms) delay(ms)
+
+void st7789v_Init() {
   TOUCH_LCD_IO_Init();
 
   /* Sleep In Command */
@@ -89,10 +110,9 @@ void st7789v_Init(void) {
   st7789v_DisplayOn();
 }
 
-void st7789v_DisplayOn(void) {
+void st7789v_DisplayOn() {
   /* Display ON command */
   LCD_IO_WriteReg(ST7789V_DISPLAY_ON);
-
   /* Sleep Out command */
   LCD_IO_WriteReg(ST7789V_SLEEP_OUT);
 }

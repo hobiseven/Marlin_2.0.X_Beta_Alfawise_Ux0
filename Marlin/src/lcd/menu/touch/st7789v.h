@@ -1,8 +1,28 @@
+/**
+ * Marlin 3D Printer Firmware
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #include <stdint.h>
 
-/**
-  * @brief  ST7789V Registers
-  */
+// ST7789V Registers
+// cf. https://www.crystalfontz.com/controllers/Sitronix/ST7789V/470/
+
+#define ST7789V_SWRESET            0x01 /* Software Reset */
 #define ST7789V_LCD_ID             0x04
 #define ST7789V_SLEEP_IN           0x10
 #define ST7789V_SLEEP_OUT          0x11
@@ -33,12 +53,9 @@
 #define ST7789V_PV_GAMMA_CTRL      0xE0
 #define ST7789V_NV_GAMMA_CTRL      0xE1
 
-#define ST7789V_SWRESET            0x01   /* Software Reset */
-
-
-void st7789v_Init(void);
-void st7789v_DisplayOn(void);
-void st7789v_WriteRam(void);
+void st7789v_Init();
+void st7789v_DisplayOn();
+void st7789v_WriteRam();
 void st7789v_SetCursor(uint16_t Xpos, uint16_t Ypos);
 void st7789v_SetWindow(uint16_t Xmin, uint16_t Ymin, uint16_t XMax = 319, uint16_t Ymax = 239);
 

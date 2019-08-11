@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,10 +26,7 @@
 void menu_touchscreen();
 void enter_touch_calibrate();
 
-// main.cpp
-int16_t do_calibration(int16_t results[4]);
-void loop_calibration();
-
+// calibration.cpp
 class TouchCalibration {
 protected:
   uint8_t calibration_state;
@@ -38,6 +35,7 @@ public:
   int16_t results[4];
   TouchCalibration();
   void init_calibration(const uint8_t init_state);
+  int16_t do_calibration(int16_t results[4]);
 };
 
 extern TouchCalibration calibration;
