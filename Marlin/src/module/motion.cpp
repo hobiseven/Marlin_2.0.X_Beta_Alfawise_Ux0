@@ -1422,7 +1422,12 @@ void homeaxis(const AxisEnum axis) {
   if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("Home 1 Fast:");
 
   #if HOMING_Z_WITH_PROBE && ENABLED(BLTOUCH)
-    if (axis == Z_AXIS && bltouch.deploy()) return; // The initial DEPLOY
+    if (axis == Z_AXIS) {
+      #ifdef ALFAWISE_UX0
+        X_disable; // go figure why that locks BLTouch v3 commands (and not the 3DTouch)
+      #endif
+      if (bltouch.deploy()) return; // The initial DEPLOY
+    }
   #endif
 
   do_homing_move(axis, 1.5f * max_length(

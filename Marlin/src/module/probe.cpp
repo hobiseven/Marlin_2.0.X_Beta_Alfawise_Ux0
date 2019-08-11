@@ -73,7 +73,7 @@ float zprobe_zoffset; // Initialized by settings.load()
   #include "../feature/tmc_util.h"
 #endif
 
-#if QUIET_PROBING
+#if QUIET_PROBING || HOMING_Z_WITH_PROBE
   #include "stepper_indirection.h"
 #endif
 
@@ -743,6 +743,10 @@ float probe_pt(const float &rx, const float &ry, const ProbePtRaise raise_after/
 
   // Move the probe to the starting XYZ
   do_blocking_move_to(nx, ny, nz);
+
+  #ifdef ALFAWISE_UX0
+    X_disable; // go figure why that locks BLTouch v3 commands (and not the 3DTouch)
+  #endif
 
   float measured_z = NAN;
   if (!DEPLOY_PROBE()) {

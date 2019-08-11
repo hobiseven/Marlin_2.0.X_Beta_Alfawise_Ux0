@@ -436,6 +436,9 @@ G29_TYPE GcodeSuite::G29() {
     if (!no_action) set_bed_leveling_enabled(false);
 
     #if HAS_BED_PROBE
+      #ifdef ALFAWISE_UX0
+        X_disable; // go figure why that locks BLTouch v3 commands (and not the 3DTouch)
+      #endif
       // Deploy the probe. Probe will raise if needed.
       if (DEPLOY_PROBE()) {
         set_bed_leveling_enabled(abl_should_enable);
@@ -767,6 +770,9 @@ G29_TYPE GcodeSuite::G29() {
     #endif // AUTO_BED_LEVELING_3POINT
 
     // Stow the probe. No raise for FIX_MOUNTED_PROBE.
+    #ifdef ALFAWISE_UX0
+      X_disable; // go figure why that locks BLTouch v3 commands (and not the 3DTouch)
+    #endif
     if (STOW_PROBE()) {
       set_bed_leveling_enabled(abl_should_enable);
       measured_z = NAN;
@@ -981,6 +987,10 @@ G29_TYPE GcodeSuite::G29() {
 
   #if HAS_BED_PROBE && defined(Z_AFTER_PROBING)
     move_z_after_probing();
+  #endif
+
+  #ifdef ALFAWISE_UX0
+    X_enable; // restore disabled X driver
   #endif
 
   report_current_position();
