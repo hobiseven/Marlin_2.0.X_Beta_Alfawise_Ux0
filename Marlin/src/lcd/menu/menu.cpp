@@ -425,8 +425,22 @@ void MarlinUI::completion_feedback(const bool good/*=true*/) {
 #endif
 
 #if ENABLED(EEPROM_SETTINGS)
-  void lcd_store_settings()   { ui.completion_feedback(settings.save()); }
-  void lcd_load_settings()    { ui.completion_feedback(settings.load()); }
+  void lcd_store_settings() {
+    const bool saved = settings.save();
+    #if HAS_BUZZER
+      ui.completion_feedback(saved);
+    #endif
+    ui.refresh(LCDVIEW_CALL_REDRAW_NEXT);
+    UNUSED(saved);
+  }
+  void lcd_load_settings() {
+    const bool loaded = settings.load();
+    #if HAS_BUZZER
+      ui.completion_feedback(loaded);
+    #endif
+    ui.refresh(LCDVIEW_CALL_REDRAW_NEXT);
+    UNUSED(loaded);
+  }
 #endif
 
 void _lcd_draw_homing() {
