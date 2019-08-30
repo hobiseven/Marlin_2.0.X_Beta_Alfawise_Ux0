@@ -2077,7 +2077,7 @@
 //
 // MKS Robin 320x240 color display OR Alfawise. Same interface is used.
 //
-#define MKS_ROBIN_TFT
+#define FSMC_GRAPHICAL_TFT
 
 //=============================================================================
 //========================= TouchScreen calibration ===========================

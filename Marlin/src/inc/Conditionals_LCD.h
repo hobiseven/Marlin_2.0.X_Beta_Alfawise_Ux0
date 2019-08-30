@@ -236,9 +236,9 @@
  #endif
 
  /**
-  * FSMC/SPI TFT PANELS
+  * FSMC TFT PANELS
   */
- #if ENABLED(MKS_ROBIN_TFT)
+ #if ENABLED(FSMC_GRAPHICAL_TFT)
    #define ULTRA_LCD
    #define DOGLCD
    #define ULTIPANEL
