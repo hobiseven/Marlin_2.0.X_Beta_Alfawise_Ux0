@@ -51,7 +51,7 @@
    * here we define this default string as the date where the latest release
    * version was tagged.
    */
-  #define STRING_DISTRIBUTION_DATE "2019-08-11"
+  #define STRING_DISTRIBUTION_DATE "2019-08-30"
 
   /**
    * Required minimum Configuration.h and Configuration_adv.h file versions.
@@ -79,6 +79,12 @@
   #define MACHINE_NAME "Alfawise U30"
   #elif defined(U20_PLUS)
   #define MACHINE_NAME "Alfawise U20+"
+  #elif defined(LK1)
+  #define MACHINE_NAME "Longer3D LK1"
+  #elif defined(LK2)
+  #define MACHINE_NAME "Longer3D LK2"
+  #elif defined(LK4)
+  #define MACHINE_NAME "Longer3D LK4"
   #else
   #define MACHINE_NAME "3D Printer"
   #endif
