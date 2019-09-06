@@ -16,46 +16,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#pragma once
 
-#include "../../../inc/MarlinConfig.h"
+#include "../../inc/MarlinConfig.h"
 
-#if ENABLED(TOUCH_CALIBRATION) && PIN_EXISTS(FSMC_CS)
+#if ENABLED(TOUCH_CALIBRATION)
 
-#include "fsmc.h"
+// menu_touchscreen.cpp
+void menu_touchscreen();
+void enter_touch_calibrate();
 
-#ifndef USE_DOGM_IO
-void TOUCH_LCD_IO_WriteData(uint16_t RegValue) {
-  LCD->RAM = RegValue;
-  __DSB();
-}
+// calibration.cpp
+class TouchCalibration {
+protected:
+  uint8_t calibration_state;
+  void exit_calibration();
+public:
+  int16_t results[4];
+  TouchCalibration();
+  void init_calibration(const uint8_t init_state);
+  int16_t do_calibration(int16_t results[4]);
+};
 
-void TOUCH_LCD_IO_WriteReg(uint16_t Reg) {
-  LCD->REG = Reg;
-  __DSB();
-}
+extern TouchCalibration calibration;
 
-uint32_t TOUCH_LCD_IO_ReadData(uint16_t RegValue, uint8_t ReadSize) {
-  volatile uint32_t data;
-  LCD->REG = RegValue;
-  __DSB();
-
-  data = LCD->RAM; // dummy read
-  data = LCD->RAM & 0x00ff;
-
-  while (--ReadSize) {
-    data <<= 8;
-    data |= (LCD->RAM & 0x00ff);
-  }
-
-  return uint32_t(data);
-}
-#endif
-
-uint16_t TOUCH_LCD_IO_ReadReg(uint16_t RegValue) {
-  LCD->REG = RegValue;
-  __DSB();
-
-  return LCD->RAM;
-}
-
-#endif // TOUCH_CALIBRATION && FSMC
+#endif // TOUCH_CALIBRATION

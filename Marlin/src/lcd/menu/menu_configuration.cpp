@@ -48,7 +48,7 @@
 #endif
 
 #if ENABLED(TOUCH_CALIBRATION)
-  #include "touch/calibration.h"
+  #include "../../feature/touch/calibration.h"
 #endif
 
 #define HAS_DEBUG_MENU ENABLED(LCD_PROGRESS_BAR_TEST)

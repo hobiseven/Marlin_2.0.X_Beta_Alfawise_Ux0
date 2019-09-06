@@ -64,12 +64,12 @@
   #include "../feature/bedlevel/bedlevel.h"
 #endif
 
-#if ENABLED(EXTENSIBLE_UI)
-  #include "../lcd/extensible_ui/ui_api.h"
+#if ENABLED(TOUCH_CALIBRATION)
+  #include "../feature/touch/calibration.h"
 #endif
 
-#if ENABLED(TOUCH_CALIBRATION)
-  #include "../lcd/menu/touch/calibration.h"
+#if ENABLED(EXTENSIBLE_UI)
+  #include "../lcd/extensible_ui/ui_api.h"
 #endif
 
 #if HAS_SERVOS

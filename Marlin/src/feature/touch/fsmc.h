@@ -17,7 +17,7 @@
  *
  */
 
-#include "../../../inc/MarlinConfig.h"
+#include "../../inc/MarlinConfig.h"
 
 #if defined(__STM32F1__) && ENABLED(TOUCH_CALIBRATION)
 

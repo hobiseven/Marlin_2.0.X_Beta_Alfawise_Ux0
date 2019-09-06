@@ -17,13 +17,13 @@
  *
  */
 
-#include "../../../inc/MarlinConfig.h"
+#include "../../inc/MarlinConfig.h"
 
 #if ENABLED(TOUCH_CALIBRATION)
 
-#include "../../../feature/touch/xpt2046.h"
-#include "../../../module/temperature.h"
-#include "../../ultralcd.h" // ui.xxx
+#include "xpt2046.h"
+#include "../../module/temperature.h"
+#include "../../lcd/ultralcd.h" // ui.xxx
 #include "calibration.h"
 #include "lcd.h"
 

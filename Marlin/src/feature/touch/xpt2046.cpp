@@ -44,7 +44,7 @@ XPT2046 touch;
 extern int8_t encoderDiff;
 
 #if ENABLED(TOUCH_CALIBRATION)
-  #include "../../lcd/menu/touch/calibration.h"
+  #include "calibration.h"
 #endif
 
 void XPT2046::init(void) {
