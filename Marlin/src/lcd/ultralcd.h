@@ -499,7 +499,6 @@ public:
     #endif
     #if defined(TOUCH_BUTTONS)
       static volatile uint8_t touch_buttons;
-      static uint8_t read_touch_buttons();
     #endif
 
     static void update_buttons();

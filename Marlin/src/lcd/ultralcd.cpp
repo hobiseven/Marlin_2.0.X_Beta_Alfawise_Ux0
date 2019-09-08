@@ -98,7 +98,6 @@
   #if ENABLED(TOUCH_BUTTONS)
     #include "../feature/touch/xpt2046.h"
     volatile uint8_t MarlinUI::touch_buttons;
-    uint8_t MarlinUI::read_touch_buttons() { return touch.read_buttons(); }
   #endif
 #endif
 
@@ -706,7 +705,7 @@ void MarlinUI::update() {
     update_buttons();
 
     // If the action button is pressed...
-    static bool wait_for_unclick; // = 0
+    static bool wait_for_unclick; // = false
     #if ENABLED(TOUCH_BUTTONS)
       if (touch_buttons) {
         if (!wait_for_unclick && (buttons & EN_C)) {    // If not waiting for a debounce release:
@@ -811,7 +810,7 @@ void MarlinUI::update() {
       #endif
 
       #if ENABLED(TOUCH_BUTTONS)
-        touch_buttons = read_touch_buttons();
+        touch_buttons = touch.read_buttons();
         if (touch_buttons) RESET_STATUS_TIMEOUT();
       #endif
 
