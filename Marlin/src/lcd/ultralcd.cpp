@@ -730,11 +730,10 @@ void MarlinUI::update() {
           }
         }
       }
-      else
-    #endif //TOUCH_BUTTONS
-    //
-    // Integrated LCD click handling via button_pressed()
-    //
+      else // keep wait_for_unclick value
+    #endif // TOUCH_BUTTONS
+
+    // Integrated LCD click handling via button_pressed
     if (!external_control && button_pressed()) {
       if (!wait_for_unclick) {                        // If not waiting for a debounce release:
         wait_for_unclick = true;                      //  - Set debounce flag to ignore continous clicks
@@ -743,14 +742,13 @@ void MarlinUI::update() {
         quick_feedback();                             //  - Always make a click sound
       }
     }
-    else wait_for_unclick = false;
+    else
+      wait_for_unclick = false;
 
-    #if HAS_DIGITAL_BUTTONS && (BUTTON_EXISTS(BACK) || ENABLED(TOUCH_BUTTONS))
-      if (LCD_BACK_CLICKED()) {
-        quick_feedback();
-        goto_previous_screen();
-      }
-    #endif
+    if (LCD_BACK_CLICKED()) {
+      quick_feedback();
+      goto_previous_screen();
+    }
 
   #endif // HAS_LCD_MENU
 
@@ -796,7 +794,7 @@ void MarlinUI::update() {
     next_lcd_update_ms = ms + LCD_UPDATE_INTERVAL;
     #if ENABLED(TOUCH_BUTTONS)
       if (on_status_screen())
-        next_lcd_update_ms += LCD_UPDATE_INTERVAL * 2;
+        next_lcd_update_ms += (LCD_UPDATE_INTERVAL * 2);
     #endif
 
     #if ENABLED(LCD_HAS_STATUS_INDICATORS)
