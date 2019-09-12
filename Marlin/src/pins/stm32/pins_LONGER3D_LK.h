@@ -165,5 +165,5 @@
   #define EEPROM_PAGE_SIZE     (0x800U)     // 2KB, but will use 2x more (4KB)
   #define E2END (EEPROM_PAGE_SIZE - 1)
 #else
-  #define E2END (0x7FFU) // On SD, Limit to 2KB, require this amount of RAM
+  #define E2END (0x7FF) // On SD, Limit to 2KB, require this amount of RAM
 #endif
