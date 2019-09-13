@@ -62,8 +62,6 @@
   #define MSerial4  Serial4
   #define MSerial5  Serial5
 #else
-  extern USBSerial SerialUSB;
-  #define UsbSerial SerialUSB
   #define MSerial1  Serial
   #define MSerial2  Serial1
   #define MSerial3  Serial2
