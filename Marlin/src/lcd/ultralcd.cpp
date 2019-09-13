@@ -177,6 +177,10 @@ millis_t next_button_update_ms;
     int8_t MarlinUI::encoderDirection = 1;
   #endif
 
+  #if ENABLED(TOUCH_BUTTONS)
+    uint8_t MarlinUI::repeat_delay;
+  #endif
+
   bool MarlinUI::lcd_clicked;
   float move_menu_scale;
 
@@ -708,6 +712,7 @@ void MarlinUI::update() {
     static bool wait_for_unclick; // = false
     #if ENABLED(TOUCH_BUTTONS)
       if (touch_buttons) {
+        RESET_STATUS_TIMEOUT();
         if (!wait_for_unclick && (buttons & EN_C)) {    // If not waiting for a debounce release:
           wait_for_unclick = true;                      //  - Set debounce flag to ignore continous clicks
           lcd_clicked = !wait_for_user && !no_reentry;  //  - Keep the click if not waiting for a user-click
@@ -717,7 +722,7 @@ void MarlinUI::update() {
         else if (buttons & (EN_A | EN_B)) {             // Ignore the encoder if clicked, to prevent "slippage"
           const millis_t ms = millis();
           if (ELAPSED(ms, next_button_update_ms)) {
-            next_button_update_ms = ms + 50;
+            next_button_update_ms = ms + repeat_delay;
             encoderDiff = (ENCODER_STEPS_PER_MENU_ITEM) * (ENCODER_PULSES_PER_STEP) * encoderDirection;
             if (buttons & EN_A) encoderDiff *= -1;
             if (!wait_for_unclick) {
@@ -809,7 +814,6 @@ void MarlinUI::update() {
 
       #if ENABLED(TOUCH_BUTTONS)
         touch_buttons = touch.read_buttons();
-        if (touch_buttons) RESET_STATUS_TIMEOUT();
       #endif
 
       #if ENABLED(REPRAPWORLD_KEYPAD)
