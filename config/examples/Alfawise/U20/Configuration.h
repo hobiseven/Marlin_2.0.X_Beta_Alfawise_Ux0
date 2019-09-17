@@ -2134,6 +2134,9 @@
 #if ENABLED(TOUCH_BUTTONS)
   #define TOUCH_CALIBRATION // Include user calibration widget in menus (Alfawise)
 
+  #define BUTTON_DELAY_EDIT  60 // (ms) Button repeat delay for edit screens
+  #define BUTTON_DELAY_MENU  75 // (ms) Button repeat delay for menus
+
   #if ENABLED(TS_V11)
     // Alfawise U20 ILI9341 2.8 TP Ver 1.1 / Green PCB on the back of touchscreen
     #define XPT2046_X_CALIBRATION   11605

@@ -97,7 +97,7 @@
   #endif
   #if ENABLED(TOUCH_BUTTONS)
     #include "../feature/touch/xpt2046.h"
-    volatile uint8_t MarlinUI::touch_buttons;
+    uint8_t MarlinUI::touch_buttons;
   #endif
 #endif
 
@@ -710,6 +710,7 @@ void MarlinUI::update() {
 
     // If the action button is pressed...
     static bool wait_for_unclick; // = false
+
     #if ENABLED(TOUCH_BUTTONS)
       if (touch_buttons) {
         RESET_STATUS_TIMEOUT();
@@ -719,14 +720,13 @@ void MarlinUI::update() {
           wait_for_user = false;                        //  - Any click clears wait for user
           quick_feedback();                             //  - Always make a click sound
         }
-        else if (buttons & (EN_A | EN_B)) {             // Ignore the encoder if clicked, to prevent "slippage"
-          const millis_t ms = millis();
+        else if (buttons & (EN_A | EN_B)) {             // Menu arrows
           if (ELAPSED(ms, next_button_update_ms)) {
-            next_button_update_ms = ms + repeat_delay;
             encoderDiff = (ENCODER_STEPS_PER_MENU_ITEM) * (ENCODER_PULSES_PER_STEP) * encoderDirection;
             if (buttons & EN_A) encoderDiff *= -1;
+            next_button_update_ms = ms + repeat_delay;  // Assume the repeat delay
             if (!wait_for_unclick) {
-              next_button_update_ms += 250;
+              next_button_update_ms += 250;             // Longer delay on first press
               #if HAS_BUZZER
                 buzz(LCD_FEEDBACK_FREQUENCY_DURATION_MS, LCD_FEEDBACK_FREQUENCY_HZ);
               #endif

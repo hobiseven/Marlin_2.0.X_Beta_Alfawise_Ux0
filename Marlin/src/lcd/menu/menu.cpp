@@ -132,7 +132,7 @@ void MenuItem_gcode::action(PGM_P pgcode) { enqueue_and_echo_commands_P(pgcode);
 void MenuItemBase::edit(strfunc_t strfunc, loadfunc_t loadfunc) {
   ui.encoder_direction_normal();
   #if ENABLED(TOUCH_BUTTONS)
-    ui.repeat_delay = 60;
+    ui.repeat_delay = BUTTON_DELAY_EDIT;
   #endif
   if (int16_t(ui.encoderPosition) < 0) ui.encoderPosition = 0;
   if (int16_t(ui.encoderPosition) > maxEditValue) ui.encoderPosition = maxEditValue;
@@ -202,7 +202,7 @@ void MarlinUI::goto_screen(screenFunc_t screen, const uint16_t encoder/*=0*/, co
   if (currentScreen != screen) {
 
     #if ENABLED(TOUCH_BUTTONS)
-      repeat_delay = 75;
+      repeat_delay = BUTTON_DELAY_MENU;
     #endif
 
     #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)

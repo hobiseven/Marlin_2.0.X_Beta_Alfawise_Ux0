@@ -1969,9 +1969,27 @@
 //=============================================================================
 
 //
-// MKS Robin 320x240 color display
+// FSMC display (MKS Robin, Alfawise U20, JGAurora A5S, A1, etc.)
 //
 //#define FSMC_GRAPHICAL_TFT
+
+//=============================================================================
+//========================= TouchScreen calibration ===========================
+//=============================================================================
+
+//#define TOUCH_BUTTONS
+#if ENABLED(TOUCH_BUTTONS)
+  #define TOUCH_CALIBRATION // Include user calibration widget in menus (Alfawise)
+
+  #define BUTTON_DELAY_EDIT  50 // (ms) Button repeat delay for edit screens
+  #define BUTTON_DELAY_MENU 250 // (ms) Button repeat delay for menus
+
+  /* Alfawise Ux0 ILI9341 2.8 TP Ver 1.2 / Blue PCB( on the back of touchscreen) */
+  #define XPT2046_X_CALIBRATION   12316
+  #define XPT2046_Y_CALIBRATION  -8981
+  #define XPT2046_X_OFFSET       -43
+  #define XPT2046_Y_OFFSET        257
+#endif
 
 //=============================================================================
 //============================  Other Controllers  ============================
