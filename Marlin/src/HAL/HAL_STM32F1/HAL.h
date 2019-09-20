@@ -28,6 +28,9 @@
 
 #define CPU_32_BIT
 
+#ifndef snprintf_P
+  #define snprintf_P snprintf
+#endif
 #ifndef vsnprintf_P
   #define vsnprintf_P vsnprintf
 #endif
@@ -59,8 +62,6 @@
   #define MSerial4  Serial4
   #define MSerial5  Serial5
 #else
-  extern USBSerial SerialUSB;
-  #define UsbSerial SerialUSB
   #define MSerial1  Serial
   #define MSerial2  Serial1
   #define MSerial3  Serial2

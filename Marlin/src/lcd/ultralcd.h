@@ -1,9 +1,9 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
- * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
+ * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -390,6 +390,10 @@ public:
 
   #if HAS_LCD_MENU
 
+    #if ENABLED(TOUCH_BUTTONS)
+      static uint8_t repeat_delay;
+    #endif
+
     #if ENABLED(ENCODER_RATE_MULTIPLIER)
       static bool encoderRateMultiplierEnabled;
       static millis_t lastEncoderMovementMillis;
@@ -497,9 +501,8 @@ public:
       static volatile uint8_t slow_buttons;
       static uint8_t read_slow_buttons();
     #endif
-    #if defined(TOUCH_BUTTONS)
-      static volatile uint8_t touch_buttons;
-      static uint8_t read_touch_buttons();
+    #if ENABLED(TOUCH_BUTTONS)
+      static uint8_t touch_buttons;
     #endif
 
     static void update_buttons();
