@@ -97,7 +97,6 @@
   #endif
   #if ENABLED(TOUCH_BUTTONS)
     #include "../feature/touch/xpt2046.h"
-    uint8_t MarlinUI::touch_buttons;
   #endif
 #endif
 
@@ -178,6 +177,7 @@ millis_t next_button_update_ms;
   #endif
 
   #if ENABLED(TOUCH_BUTTONS)
+    uint8_t MarlinUI::touch_buttons;
     uint8_t MarlinUI::repeat_delay;
   #endif
 
@@ -294,9 +294,6 @@ void MarlinUI::init() {
 
   #if HAS_ENCODER_ACTION && HAS_SLOW_BUTTONS
     slow_buttons = 0;
-  #endif
-  #if HAS_ENCODER_ACTION && ENABLED(TOUCH_BUTTONS)
-    touch_buttons = 0;
   #endif
 
   update_buttons();
@@ -727,10 +724,10 @@ void MarlinUI::update() {
             next_button_update_ms = ms + repeat_delay;  // Assume the repeat delay
             if (!wait_for_unclick) {
               next_button_update_ms += 250;             // Longer delay on first press
+              wait_for_unclick = true;                  // Avoid Back/Select click while repeating
               #if HAS_BUZZER
                 buzz(LCD_FEEDBACK_FREQUENCY_DURATION_MS, LCD_FEEDBACK_FREQUENCY_HZ);
               #endif
-              wait_for_unclick = true;                  //  - Set debounce flag to ignore continous clicks
             }
           }
         }
@@ -799,7 +796,10 @@ void MarlinUI::update() {
     next_lcd_update_ms = ms + LCD_UPDATE_INTERVAL;
     #if ENABLED(TOUCH_BUTTONS)
       if (on_status_screen())
-        next_lcd_update_ms += (LCD_UPDATE_INTERVAL * 2);
+        next_lcd_update_ms += (LCD_UPDATE_INTERVAL) * 2;
+      #if HAS_LCD_MENU
+        touch_buttons = touch.read_buttons();
+      #endif
     #endif
 
     #if ENABLED(LCD_HAS_STATUS_INDICATORS)
@@ -810,10 +810,6 @@ void MarlinUI::update() {
 
       #if HAS_SLOW_BUTTONS
         slow_buttons = read_slow_buttons(); // Buttons that take too long to read in interrupt context
-      #endif
-
-      #if ENABLED(TOUCH_BUTTONS)
-        touch_buttons = touch.read_buttons();
       #endif
 
       #if ENABLED(REPRAPWORLD_KEYPAD)
@@ -1147,7 +1143,7 @@ void MarlinUI::update() {
           #if HAS_SLOW_BUTTONS
             | slow_buttons
           #endif
-          #if ENABLED(TOUCH_BUTTONS)
+          #if HAS_LCD_MENU && ENABLED(TOUCH_BUTTONS)
             | touch_buttons
           #endif
         ;

@@ -391,6 +391,7 @@ public:
   #if HAS_LCD_MENU
 
     #if ENABLED(TOUCH_BUTTONS)
+      static uint8_t touch_buttons;
       static uint8_t repeat_delay;
     #endif
 
@@ -500,9 +501,6 @@ public:
     #if HAS_SLOW_BUTTONS
       static volatile uint8_t slow_buttons;
       static uint8_t read_slow_buttons();
-    #endif
-    #if ENABLED(TOUCH_BUTTONS)
-      static uint8_t touch_buttons;
     #endif
 
     static void update_buttons();
